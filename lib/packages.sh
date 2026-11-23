@@ -6,7 +6,7 @@ ensure_paru() {
   local tmp
   tmp=$(mktemp -d)
   git clone --depth 1 https://aur.archlinux.org/paru-bin.git "$tmp/paru-bin"
-  (cd "$tmp/paru-bin" && makepkg -si --noconfirm)
+  (cd "$tmp/paru-bin" && makepkg -s --noconfirm && sudo pacman -U --noconfirm paru-bin-[0-9]*.pkg.tar.zst)
   rm -rf "$tmp"
 }
 

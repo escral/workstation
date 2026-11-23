@@ -11,3 +11,5 @@ efibootmgr
 grub
 sudo
 nano
+btrfs-progs
+paru-bin

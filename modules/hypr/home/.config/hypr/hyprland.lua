@@ -23,6 +23,7 @@ hl.config({
         kb_layout = "us,ru",
         kb_options = "grp:alt_shift_toggle,caps:escape",
         numlock_by_default = true,
+        repeat_delay = 400,
     },
     group = {
         col = {

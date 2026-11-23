@@ -32,8 +32,7 @@ PanelWindow {
             width: workspaces.width
             height: 22
 
-            // One pill slides to the focused workspace instead of each tab
-            // fading its own background, so a switch reads as one motion.
+            // One pill slides between tabs, so a switch reads as one motion.
             Rectangle {
                 id: indicator
                 property Item target: null

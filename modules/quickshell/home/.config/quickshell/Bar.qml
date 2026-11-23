@@ -1,5 +1,6 @@
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Services.Pipewire
 import QtQuick
 
 PanelWindow {
@@ -102,7 +103,29 @@ PanelWindow {
             precision: SystemClock.Minutes
         }
 
+        // Volume itself shows in the OSD; the bar only warns that sound is off.
+        PwObjectTracker { objects: [Pipewire.defaultAudioSink] }
+
+        Text {
+            readonly property bool muted: Pipewire.defaultAudioSink?.audio?.muted ?? false
+
+            anchors { right: date.left; rightMargin: 12; verticalCenter: parent.verticalCenter }
+            text: "\u{F075F}"
+            color: Theme.red
+            font { family: Theme.font; pointSize: Theme.fontSize + 2 }
+            opacity: muted ? 1 : 0
+            scale: muted ? 1 : 0.6
+            visible: opacity > 0
+            Behavior on opacity { NumberAnimation { duration: 160 } }
+            Behavior on scale { NumberAnimation { duration: 260; easing.type: Easing.OutBack } }
+
+            TapHandler {
+                onTapped: Pipewire.defaultAudioSink.audio.muted = false
+            }
+        }
+
         Label {
+            id: date
             anchors { right: parent.right; rightMargin: 14 }
             textFormat: Text.StyledText
             text: `<font color="${Theme.subtext}">${Qt.formatDateTime(clock.date, "ddd dd.MM.yyyy")}</font>`

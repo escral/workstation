@@ -4,6 +4,7 @@ import QtQuick
 ShellRoot {
     Lock {}
     Notifications {}
+    VolumeOsd {}
 
     Variants {
         model: Quickshell.screens

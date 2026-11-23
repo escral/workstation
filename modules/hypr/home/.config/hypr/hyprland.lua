@@ -52,6 +52,29 @@ hl.config({
     },
 })
 
+-- Moves and resizes run on a stiff spring (damping ~0.87 of critical: a hint
+-- of settle, no wobble). Fades and closing use a fixed ease-out.
+hl.curve("outQuint", { type = "bezier", points = { {0.23, 1}, {0.32, 1} } })
+hl.curve("spring", { type = "spring", mass = 1, stiffness = 600, damping = 43 })
+hl.animation({ leaf = "global", enabled = true, speed = 4, spring = "spring" })
+hl.animation({ leaf = "windows", enabled = true, speed = 4, spring = "spring" })
+-- A new window slides in from the nearest screen edge, as if pushing the one
+-- it splits from aside; the rule below makes a lone window pop in instead.
+hl.animation({ leaf = "windowsIn", enabled = true, speed = 4, spring = "spring", style = "slide" })
+hl.animation({ leaf = "windowsOut", enabled = true, speed = 1, bezier = "outQuint", style = "popin 90%" })
+-- Mostly visible within the first frames, then eases out over about as long
+-- as the neighbour takes to shrink, so the two read as one motion.
+hl.animation({ leaf = "fadeIn", enabled = true, speed = 2, bezier = "outQuint" })
+hl.animation({ leaf = "fadeOut", enabled = true, speed = 1, bezier = "outQuint" })
+-- Switching workspaces should feel instant; a short fade only softens it.
+hl.animation({ leaf = "workspaces", enabled = true, speed = 1, bezier = "outQuint", style = "fade" })
+hl.animation({ leaf = "layers", enabled = true, speed = 1.2, bezier = "outQuint", style = "fade" })
+hl.window_rule({
+    name = "popin-when-alone",
+    match = { workspace = "w[tv1]" },
+    animation = "popin 85%",
+})
+
 -- `uwsm app --` gives each long-running app its own systemd unit.
 hl.on("hyprland.start", function()
     hl.exec_cmd("uwsm app -- quickshell")

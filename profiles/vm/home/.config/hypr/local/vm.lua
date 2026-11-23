@@ -1,5 +1,4 @@
--- No hardware cursor under virtio-gpu; keep animations cheap.
+-- No hardware cursor under virtio-gpu.
 hl.config({
     cursor = { no_hardware_cursors = true },
-    animations = { enabled = false },
 })

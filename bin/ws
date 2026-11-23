@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+# ws — workstation CLI.
+set -euo pipefail
+
+WS_ROOT="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)"
+# shellcheck source=../lib/common.sh
+source "$WS_ROOT/lib/common.sh"
+# shellcheck source=../lib/stow.sh
+source "$WS_ROOT/lib/stow.sh"
+# shellcheck source=../lib/packages.sh
+source "$WS_ROOT/lib/packages.sh"
+
+usage() {
+  cat <<USAGE
+usage: ws <command> [args]
+
+  install [--profile NAME]   packages + dotfiles + module hooks (idempotent)
+  sync                       restow dotfiles only (fast, after editing the repo)
+  update                     git pull, system upgrade, then install
+  drift                      packages installed but not declared, and vice versa
+  profile [NAME]             show current profile, or switch to NAME
+  vm <sub>                   VM harness (ws vm help)
+  help                       this text
+USAGE
+}
+
+# Resolve profile: explicit arg > saved > ask.
+resolve_profile() {
+  local p=${1:-$(current_profile || true)}
+  [[ -n $p ]] || die "no profile set. Use: ws install --profile <$(list_profiles | paste -sd'|')>"
+  printf '%s' "$p"
+}
+
+save_profile() {
+  mkdir -p "$WS_CONFIG"
+  printf '%s\n' "$1" >"$WS_CONFIG/profile"
+}
+
+do_stow() {
+  local m p
+  for m in "${modules[@]}"; do
+    stow_home "$WS_ROOT/modules/$m" "module:$m"
+  done
+  for p in "${WS_PROFILE_CHAIN[@]}"; do
+    stow_home "$WS_ROOT/profiles/$p" "profile:$p"
+  done
+}
+
+run_hooks() {
+  local m hook
+  for m in "${modules[@]}"; do
+    hook="$WS_ROOT/modules/$m/setup.sh"
+    [[ -f $hook ]] || continue
+    log "setup: $m"
+    WS_MODULE="$m" WS_MODULE_DIR="$WS_ROOT/modules/$m" bash "$hook"
+  done
+}
+
+cmd_install() {
+  local profile=''
+  while (($#)); do
+    case $1 in
+      --profile) profile=${2:?}; shift 2 ;;
+      --profile=*) profile=${1#*=}; shift ;;
+      *) die "unknown arg: $1" ;;
+    esac
+  done
+  profile=$(resolve_profile "$profile")
+  load_profile "$profile"
+  save_profile "$profile"
+  log "profile: ${WS_PROFILE_CHAIN[*]}"
+  log "modules: ${modules[*]}"
+  install_packages "${modules[@]}"
+  log "stowing dotfiles"
+  do_stow
+  run_hooks
+  log "done"
+}
+
+cmd_sync() {
+  load_profile "$(resolve_profile)"
+  do_stow
+}
+
+cmd_update() {
+  log "pulling $WS_ROOT"
+  git -C "$WS_ROOT" pull --ff-only || warn "git pull failed, continuing with local tree"
+  log "system upgrade"
+  if have paru; then paru -Syu --noconfirm; else sudo pacman -Syu --noconfirm; fi
+  cmd_install
+}
+
+cmd_drift() {
+  load_profile "$(resolve_profile)"
+  local declared installed ignore wanted
+  declared=$(all_declared_packages)
+  ignore=$(read_list "$WS_ROOT/drift-ignore" | sort -u)
+  installed=$(pacman -Qqe | sort -u)
+
+  log "installed explicitly, not declared in any module"
+  comm -23 <(printf '%s\n' "$installed") \
+           <(printf '%s\n%s\n' "$declared" "$ignore" | sort -u) | sed 's/^/    /'
+
+  log "declared by active modules, not installed"
+  wanted=$(for m in "${modules[@]}"; do
+    read_list "$WS_ROOT/modules/$m/packages"
+    read_list "$WS_ROOT/modules/$m/aur"
+  done | sort -u)
+  comm -23 <(printf '%s\n' "$wanted") <(pacman -Qq | sort -u) | sed 's/^/    /'
+}
+
+cmd_profile() {
+  if (($#)); then
+    load_profile "$1"   # validate before saving
+    save_profile "$1"
+    log "profile set to $1 — run 'ws install' to apply"
+    return
+  fi
+  local p
+  p=$(resolve_profile)
+  load_profile "$p"
+  echo "profile: ${WS_PROFILE_CHAIN[*]}"
+  echo "modules: ${modules[*]}"
+  echo "available: $(list_profiles | paste -sd' ')"
+}
+
+main() {
+  local cmd=${1:-help}
+  shift || true
+  case $cmd in
+    install) cmd_install "$@" ;;
+    sync)    cmd_sync "$@" ;;
+    update)  cmd_update "$@" ;;
+    drift)   cmd_drift "$@" ;;
+    profile) cmd_profile "$@" ;;
+    vm)      exec bash "$WS_ROOT/vm/vm.sh" "$@" ;;
+    help|-h|--help) usage ;;
+    *) usage; exit 1 ;;
+  esac
+}
+
+main "$@"

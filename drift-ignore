@@ -1,0 +1,13 @@
+# Packages archinstall puts on every machine; not worth declaring in a module.
+base
+base-devel
+linux
+linux-lts
+linux-firmware
+linux-headers
+intel-ucode
+amd-ucode
+efibootmgr
+grub
+sudo
+nano

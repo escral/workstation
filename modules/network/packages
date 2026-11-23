@@ -1,0 +1,3 @@
+networkmanager
+# GUI fallback for VPN/proxy/static IP
+nm-connection-editor

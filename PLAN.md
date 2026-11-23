@@ -1,0 +1,123 @@
+# Plan
+
+Personal Arch Linux layer: one command on a bare Arch install gives my full
+workstation. Not a distro — a layer on top of Arch.
+
+## Decisions
+
+| Area | Choice | Why |
+|---|---|---|
+| Base | Arch Linux (`archinstall`, then `boot.sh`) | Rolling, AUR has Hyprland/Quickshell, fast iteration |
+| Compositor | Hyprland | Biggest ecosystem; Quickshell works with it |
+| Shell UI | Quickshell | Bar, launcher, notifications, OSD, help overlay — replaces dunst/rofi/i3status |
+| GUI fallback | nm-connection-editor (VPN/proxy), pavucontrol, blueman | Configure things by GUI when no tool exists. Full GNOME session dropped (~1GB) — revisit if needed |
+| Session | greetd + tuigreet → `uwsm start hyprland.desktop` | uwsm = systemd-managed session: clean env, apps as units, proper logout |
+| Filesystem | **btrfs** (archinstall default subvolumes) — required at install time | Enables snapshots; can't be added later without reinstall |
+| Snapshots | snapper + snap-pac (snapshot before every pacman run), bootable snapshots | Rollback = Arch's replacement for "LTS stability" |
+| Updates | No unattended upgrades. `ws update` + notifier (checkupdates) + paccache.timer | Rolling release should be upgraded while watched |
+| Firewall | ufw: deny incoming, allow outgoing | Simple; note Docker bypasses ufw — bind to 127.0.0.1 |
+| Install | Plain bash + `ws` CLI. No Ansible, no mise | Most Ansible tasks were `shell:` anyway; less to learn, fewer deps |
+| Packages | Per-module `packages` / `aur` lists, `pacman --needed` / `paru` | Declarative enough, readable |
+| Baseline | `base` = only what the layer needs to operate (git, stow, curl, base-devel, `ws` on PATH). Every feature — even network/audio — is a module | Simple parts and their advanced config live together in one module |
+| Dotfiles | GNU Stow, `--no-folding`, symlinks into this repo | Live editing, Quickshell hot reload |
+| Runtimes | fnm (Node), official installer (Bun), pacman (PHP) | Each tool's native way |
+| Secrets | Bitwarden (`rbw`) — SSH keys fetched at bootstrap | Repo stays public, nothing encrypted in git |
+| App state | restic backup of Chrome/Slack/Telegram + keyring, key in Bitwarden | Config in git, state in backup. Never in git |
+| Theme | One token file → generated configs for every app | Theme switch = one change |
+| Bindings | Action catalog (`actions.toml` per module) generates hypr/kitty bind files, help overlay, launcher catalog | One source of truth |
+| Profiles | `profiles/<name>/` = modules + flags + overlay files (monitors, autostart, peripherals) | Whole-machine setup, not only hardware |
+| Testing | QEMU VM with virgl; `ws vm fresh` = clean snapshot + full bootstrap | See a reinstall without reinstalling; catch drift |
+| AI | Small specialized local models (embeddings, whisper, piper, reranker), GPU tier optional via profile flag | Must run on CPU-only machines |
+
+## Layout
+
+```
+boot.sh                 curl | bash entry on bare Arch
+bin/ws                  CLI (install, sync, update, drift, vm, ...)
+lib/                    shared bash helpers
+modules/<name>/
+  packages              pacman packages, one per line, # comments ok
+  aur                   AUR packages
+  home/                 stow package, mirrors $HOME
+  setup.sh              optional idempotent hook (runs after packages + stow)
+  actions.toml          optional bindings/actions for the catalog
+profiles/<name>/
+  profile.sh            extends, modules, flags
+  home/                 overlay, stowed after modules
+vm/                     VM harness
+```
+
+### Overlay rule
+
+Overlays **add** files, never replace module files (stow would conflict).
+Modules expose include points instead, e.g. `hyprland.conf` sources
+`~/.config/hypr/local/*.conf`; a profile drops `local/monitors.conf` there.
+
+### Profile format
+
+`profile.sh` is sourced bash (zero dependencies on a bare machine):
+
+```bash
+extends=base
+modules+=(hypr kitty)
+GPU=nvidia
+AI_TIER=gpu
+```
+
+## Modules
+
+| Module | Contents | Profiles |
+|---|---|---|
+| base | git, stow, curl, base-devel, pacman tweaks, `ws` on PATH | all |
+| network | NetworkManager, nm-connection-editor | all |
+| audio | pipewire, wireplumber, pavucontrol | all |
+| ssh | openssh (later: keys from Bitwarden) | all |
+| cli | fzf, ripgrep, fd, jq, unzip, man-db | all |
+| firewall | ufw | all |
+| maintenance | pacman-contrib, paccache.timer | all |
+| login | greetd + tuigreet → uwsm Hyprland | all |
+| fonts | FiraCode Nerd, Noto, emoji | all |
+| zsh | zsh + plugins, chsh (config to port) | all |
+| hypr | Hyprland, hypridle/lock, portals, polkit agent, screenshots, xdg-user-dirs | all |
+| quickshell | Quickshell (placeholder bar) | all |
+| kitty | kitty (config to port) | all |
+| bluetooth | bluez, blueman | home |
+| nvidia | nvidia-open + Wayland bits | home |
+| dev-node / dev-bun / dev-php | fnm / bun / php+composer | home, work |
+
+## Action catalog (planned)
+
+```toml
+[[action]]
+title = "New tab"
+group = "terminal/tabs"
+keys  = "ctrl+shift+t"
+kitty = "new_tab_with_cwd"
+```
+
+Generator writes `~/.config/kitty/binds.conf`, `~/.config/hypr/binds.conf`,
+help-overlay data and launcher catalog. App configs `include` the generated file.
+Each target uses the app's native syntax — generator only translates keys.
+Watcher regenerates and runs `kitty @ load-config` / `hyprctl reload`.
+Lint warns about raw binds not in the catalog and key conflicts.
+Help overlay is context-aware via `hyprctl activewindow`.
+Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
+
+## Help overlay (planned)
+
+- Hold Super ~300ms → overlay of Super binds; adding Shift filters live.
+- Leader: Super+Space → Hyprland submaps (`w` window, `s` screenshot, `a` AI...),
+  which-key popup at each step.
+
+## Roadmap
+
+1. [x] Skeleton, `ws` CLI, bootstrap, starter modules/profiles
+2. [ ] VM: enable VT-x in BIOS, build base image (btrfs), `ws vm fresh` green
+2a. [ ] Snapshots module: snapper + snap-pac + bootable snapshots
+3. [ ] Port zsh, kitty, nvim, git, fzf, scripts from `~/.dotfiles`
+4. [ ] Hyprland config + Quickshell bar/launcher/notifications
+5. [ ] Theme tokens + generators
+6. [ ] Action catalog generator + help overlay
+7. [ ] Bitwarden SSH restore, restic state backup/restore
+8. [ ] AI module (embeddings search, whisper dictation, piper)
+9. [ ] Install on home PC (wipe Linux partition, keep Windows)

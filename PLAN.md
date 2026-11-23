@@ -116,7 +116,7 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 2. [x] VM: `ws vm base` + `ws vm fresh` green, Hyprland (Lua config) + Quickshell bar running
 2a. [ ] Snapshots module: snapper + snap-pac + bootable snapshots
 3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, kitty → ghostty ✓; nvim, git, scripts left
-4. [ ] Hyprland config + Quickshell bar/launcher/notifications
+4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓; lockscreen (agents keep running), bar widgets, notifications + volume OSD, per-profile autostart left
 5. [ ] Theme tokens + generators
 6. [ ] Action catalog generator + help overlay
 7. [ ] Bitwarden SSH restore, restic state backup/restore

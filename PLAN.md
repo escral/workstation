@@ -73,14 +73,14 @@ AI_TIER=gpu
 | network | NetworkManager, nm-connection-editor | all |
 | audio | pipewire, wireplumber, pavucontrol | all |
 | ssh | openssh (later: keys from Bitwarden) | all |
-| cli | fzf, ripgrep, fd, jq, unzip, man-db | all |
+| cli | fzf, ripgrep, fd, jq, unzip, man-db, btop | all |
 | firewall | ufw | all |
 | maintenance | pacman-contrib, paccache.timer | all |
 | login | greetd + tuigreet → uwsm Hyprland | all |
 | fonts | FiraCode Nerd, Noto, emoji | all |
 | zsh | zsh + plugins, chsh (config to port) | all |
 | hypr | Hyprland, portals, polkit agent, screenshots, xdg-user-dirs | all |
-| quickshell | Bar, shader background, lock screen + idle lock/DPMS, notification popups, volume OSD, mute/offline indicators | all |
+| quickshell | Bar, shader background, lock screen + idle lock/DPMS, notification popups, volume OSD, mute/offline/load indicators | all |
 | kitty | kitty (config to port) | all |
 | bluetooth | bluez, blueman | home |
 | nvidia | nvidia-open + Wayland bits | home |
@@ -117,7 +117,7 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 2a. [ ] Snapshots module: snapper + snap-pac + bootable snapshots
 2b. [ ] Time: NTP sync (systemd-timesyncd) and timezone per profile; the VM base image is UTC with no NTP
 3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, kitty → ghostty ✓; nvim, git, scripts left
-4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓; tray, per-profile autostart left
+4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓; tray, per-profile autostart left
 5. [ ] Theme tokens + generators
 6. [ ] Action catalog generator + help overlay
 7. [ ] Bitwarden SSH restore, restic state backup/restore

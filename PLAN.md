@@ -80,7 +80,7 @@ AI_TIER=gpu
 | fonts | FiraCode Nerd, Noto, emoji | all |
 | zsh | zsh + plugins, chsh (config to port) | all |
 | hypr | Hyprland, portals, polkit agent, screenshots, xdg-user-dirs | all |
-| quickshell | Bar, shader background, lock screen + idle lock/DPMS | all |
+| quickshell | Bar, shader background, lock screen + idle lock/DPMS, notification popups | all |
 | kitty | kitty (config to port) | all |
 | bluetooth | bluez, blueman | home |
 | nvidia | nvidia-open + Wayland bits | home |
@@ -117,7 +117,7 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 2a. [ ] Snapshots module: snapper + snap-pac + bootable snapshots
 2b. [ ] Time: NTP sync (systemd-timesyncd) and timezone per profile; the VM base image is UTC with no NTP
 3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, kitty → ghostty ✓; nvim, git, scripts left
-4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓; bar widgets, notifications + volume OSD, per-profile autostart left
+4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, notification popups ✓; volume OSD, bar widgets (volume, network when offline, tray), per-profile autostart left
 5. [ ] Theme tokens + generators
 6. [ ] Action catalog generator + help overlay
 7. [ ] Bitwarden SSH restore, restic state backup/restore

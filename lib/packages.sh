@@ -1,5 +1,10 @@
 # shellcheck shell=bash
 
+_missing() {
+  (($#)) || return 0
+  pacman -T "$@" || true
+}
+
 ensure_paru() {
   have paru && return 0
   log "installing paru (AUR helper)"
@@ -16,13 +21,15 @@ install_packages() {
     mapfile -t -O "${#pac[@]}" pac < <(read_list "$WS_ROOT/modules/$m/packages")
     mapfile -t -O "${#aur[@]}" aur < <(read_list "$WS_ROOT/modules/$m/aur")
   done
+  mapfile -t pac < <(_missing "${pac[@]}")
+  mapfile -t aur < <(_missing "${aur[@]}")
   if ((${#pac[@]})); then
-    log "pacman: ${#pac[@]} packages"
+    log "pacman: ${pac[*]}"
     sudo pacman -S --needed --noconfirm "${pac[@]}"
   fi
   if ((${#aur[@]})); then
     ensure_paru
-    log "aur: ${#aur[@]} packages"
+    log "aur: ${aur[*]}"
     paru -S --needed --noconfirm "${aur[@]}"
   fi
 }

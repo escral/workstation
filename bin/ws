@@ -42,6 +42,7 @@ do_stow() {
   for p in "${WS_PROFILE_CHAIN[@]}"; do
     stow_home "$WS_ROOT/profiles/$p" "profile:$p"
   done
+  prune_dead_links
 }
 
 run_hooks() {

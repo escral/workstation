@@ -8,6 +8,13 @@ stow_home() {
   info "stowed $label"
 }
 
+# Files deleted from the repo leave dangling links behind; restow can't see them.
+prune_dead_links() {
+  local repo_name=${WS_ROOT##*/}
+  find "$HOME/.config" "$HOME/.local" -xtype l -lname "*$repo_name/*" -print -delete 2>/dev/null \
+    | while read -r l; do info "removed dead link ${l#"$HOME"/}"; done
+}
+
 unstow_home() {
   local pkg_dir=$1
   [[ -d $pkg_dir/home ]] || return 0

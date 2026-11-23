@@ -50,8 +50,8 @@ vm/                     VM harness
 ### Overlay rule
 
 Overlays **add** files, never replace module files (stow would conflict).
-Modules expose include points instead, e.g. `hyprland.conf` sources
-`~/.config/hypr/local/*.conf`; a profile drops `local/monitors.conf` there.
+Modules expose include points instead, e.g. `hyprland.lua` loads
+`~/.config/hypr/local/*.lua`; a profile drops `local/<profile>.lua` there.
 
 ### Profile format
 
@@ -95,7 +95,7 @@ keys  = "ctrl+shift+t"
 kitty = "new_tab_with_cwd"
 ```
 
-Generator writes `~/.config/kitty/binds.conf`, `~/.config/hypr/binds.conf`,
+Generator writes `~/.config/kitty/binds.conf`, `~/.config/hypr/binds.lua`,
 help-overlay data and launcher catalog. App configs `include` the generated file.
 Each target uses the app's native syntax — generator only translates keys.
 Watcher regenerates and runs `kitty @ load-config` / `hyprctl reload`.
@@ -112,7 +112,7 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 ## Roadmap
 
 1. [x] Skeleton, `ws` CLI, bootstrap, starter modules/profiles
-2. [ ] VM: enable VT-x in BIOS, `ws vm base` + `ws vm fresh` green (automation written, untested)
+2. [x] VM: `ws vm base` + `ws vm fresh` green, Hyprland (Lua config) + Quickshell bar running
 2a. [ ] Snapshots module: snapper + snap-pac + bootable snapshots
 3. [ ] Port zsh, kitty, nvim, git, fzf, scripts from `~/.dotfiles`
 4. [ ] Hyprland config + Quickshell bar/launcher/notifications

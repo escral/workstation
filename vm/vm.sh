@@ -28,6 +28,7 @@ usage: ws vm <command>
   fresh    reset overlay to clean base, boot, run boot.sh from committed repo
   run      boot the current overlay as-is (keeps state)
   stop     ACPI shutdown of the running VM
+  shot     screenshot of the Hyprland session → .vm/shot.png
   sync     copy working tree (incl. uncommitted) into running VM, run ws install
   ssh      shell into running VM
 
@@ -185,10 +186,20 @@ PY
   log "shutdown requested"
 }
 
+# virgl output can't be captured by QEMU (screendump: "no surface"); grab it
+# from inside the session instead.
+cmd_shot() {
+  local out=${1:-$VM_DIR/shot.png}
+  ssh_vm 'export WAYLAND_DISPLAY=$(ls "$XDG_RUNTIME_DIR" | grep -m1 -E "^wayland-[0-9]+$") && grim -' >"$out"
+  log "saved $out"
+}
+
 cmd_sync() {
   log "copying working tree into VM:~/workstation"
   tar -C "$WS_ROOT" --exclude=.vm --exclude=.git -cf - . \
-    | ssh_vm 'mkdir -p ~/workstation && tar -C ~/workstation -xf -'
+    | ssh_vm 'mkdir -p ~/workstation \
+        && find ~/workstation -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} + \
+        && tar -C ~/workstation -xf -'
   ssh_vm -t '~/workstation/bin/ws install --profile vm'
 }
 
@@ -206,6 +217,7 @@ main() {
     fresh) cmd_fresh ;;
     run)   cmd_run ;;
     stop)  cmd_stop ;;
+    shot)  cmd_shot "$@" ;;
     sync)  cmd_sync ;;
     ssh)   cmd_ssh "$@" ;;
     *)     usage ;;

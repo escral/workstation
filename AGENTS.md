@@ -36,11 +36,30 @@ vm/              QEMU test harness
   the profile flags.
 - **Overlays only add files.** A profile never replaces a module's file (stow
   would conflict). Modules expose include points instead, e.g.
-  `~/.config/hypr/local/*.conf`.
+  `~/.config/hypr/local/*.lua`.
+- **Hyprland config is Lua** (0.57+): `hyprland.lua`, API under `hl.*`.
+  `hyprland.conf` is ignored.
 - **No secrets in git.** The repo is public. Secrets come from Bitwarden; app
   state comes from the restic backup.
-- **Test in the VM:** `ws vm fresh` for a full reinstall from the committed
-  tree, `ws vm sync` for working-tree changes. Don't test by installing on the
-  host.
+- **Test in the VM**, never by installing on the host.
 - **Commits:** imperative, scoped (`hypr: ...`, `vm: ...`). Commit or push
   only when asked.
+
+## VM
+
+| Command | Does |
+|---|---|
+| `ws vm base` | build clean Arch image (once) |
+| `ws vm fresh` | reset to clean image, install committed tree |
+| `ws vm run` | boot with a window (the owner usually has it open) |
+| `ws vm sync` | push working tree into running VM, run `ws install` |
+| `ws vm shot` | screenshot of the session → `.vm/shot.png` |
+| `ws vm ssh -- <cmd>` | run a command inside |
+| `ws vm stop` | clean shutdown |
+
+- Login: your user, password `ws`. Ctrl+Alt+G releases the mouse.
+- `hyprctl` over ssh needs
+  `HYPRLAND_INSTANCE_SIGNATURE=$(ls $XDG_RUNTIME_DIR/hypr | head -1)`.
+- Hyprland changes: `ws vm sync`, then `hyprctl reload` and `hyprctl configerrors`.
+- The firewall blocks ssh unless the profile sets `FIREWALL_ALLOW="ssh"`
+  (the vm profile does).

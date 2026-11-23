@@ -1,6 +1,11 @@
 theme = TokyoNight Night
-# Hyprland blurs what shows through; see decoration in hyprland.lua.
-background-opacity = 0.85
+# A new window's first frame is drawn by GTK before the terminal is ready.
+# Opaque and in the terminal's colors, it matches what follows; translucent,
+# it flashes the wallpaper. Inactive windows still get glass from Hyprland.
+window-theme = ghostty
+# Shell integration turns the cursor into a bar at the prompt; starting as a
+# block would flash one first.
+cursor-style = bar
 custom-shader = shaders/hide-unfocused-cursor.glsl
 # The shader is static; animating would redraw every frame for nothing.
 custom-shader-animation = false

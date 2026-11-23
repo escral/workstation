@@ -1,24 +1,41 @@
 # shellcheck shell=bash
+STOWED_LIST="$WS_STATE/stowed"
+
 stow_home() {
-  local pkg_dir=$1 label=$2
+  local pkg_dir=$1
   [[ -d $pkg_dir/home ]] || return 0
   _backup_conflicts "$pkg_dir/home"
   stow --no-folding --restow -d "$pkg_dir" -t "$HOME" home \
-    || die "stow failed for $label"
-  info "stowed $label"
+    || die "stow failed for ${pkg_dir#"$WS_ROOT"/}"
+  info "stowed ${pkg_dir#"$WS_ROOT"/}"
+}
+
+# A module that left the profile still has live links (its files exist), so
+# only a record of what was stowed last time can find them.
+unstow_removed() {
+  [[ -f $STOWED_LIST ]] || return 0
+  local old
+  while IFS= read -r old; do
+    [[ " $* " == *" $old "* || ! -d $old/home ]] && continue
+    stow --no-folding --delete -d "$old" -t "$HOME" home
+    info "unstowed ${old#"$WS_ROOT"/}"
+  done <"$STOWED_LIST"
+}
+
+record_stowed() {
+  mkdir -p "$WS_STATE"
+  printf '%s\n' "$@" >"$STOWED_LIST"
 }
 
 # Files deleted from the repo leave dangling links behind; restow can't see them.
 prune_dead_links() {
-  local repo_name=${WS_ROOT##*/}
-  find "$HOME/.config" "$HOME/.local" -xtype l -lname "*$repo_name/*" -print -delete 2>/dev/null \
-    | while read -r l; do info "removed dead link ${l#"$HOME"/}"; done
-}
-
-unstow_home() {
-  local pkg_dir=$1
-  [[ -d $pkg_dir/home ]] || return 0
-  stow --no-folding --delete -d "$pkg_dir" -t "$HOME" home
+  local link
+  while IFS= read -r -d '' link; do
+    [[ $(readlink -m "$link") == "$WS_ROOT"/* ]] || continue
+    rm "$link"
+    info "removed dead link ${link#"$HOME"/}"
+  done < <(find "$HOME" -maxdepth 1 -xtype l -print0
+           find "$HOME/.config" "$HOME/.local" -xtype l -print0 2>/dev/null)
 }
 
 # Move real files out of the way so distro defaults (.bashrc etc) never

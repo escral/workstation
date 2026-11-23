@@ -35,13 +35,12 @@ save_profile() {
 }
 
 do_stow() {
-  local m p
-  for m in "${modules[@]}"; do
-    stow_home "$WS_ROOT/modules/$m" "module:$m"
-  done
-  for p in "${WS_PROFILE_CHAIN[@]}"; do
-    stow_home "$WS_ROOT/profiles/$p" "profile:$p"
-  done
+  local m p d dirs=()
+  for m in "${modules[@]}"; do dirs+=("$WS_ROOT/modules/$m"); done
+  for p in "${WS_PROFILE_CHAIN[@]}"; do dirs+=("$WS_ROOT/profiles/$p"); done
+  unstow_removed "${dirs[@]}"
+  for d in "${dirs[@]}"; do stow_home "$d"; done
+  record_stowed "${dirs[@]}"
   prune_dead_links
 }
 
@@ -85,7 +84,8 @@ cmd_update() {
   log "pulling $WS_ROOT"
   git -C "$WS_ROOT" pull --ff-only || warn "git pull failed, continuing with local tree"
   log "system upgrade"
-  if have paru; then paru -Syu --noconfirm; else sudo pacman -Syu --noconfirm; fi
+  # Interactive on purpose: replacements and conflicts need a human answer.
+  if have paru; then paru -Syu; else sudo pacman -Syu; fi
   cmd_install
 }
 

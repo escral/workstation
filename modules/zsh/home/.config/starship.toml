@@ -1,0 +1,39 @@
+# ~/projects/api main* took 12s ❯
+add_newline = false
+format = "$directory$git_branch$git_status$cmd_duration$character"
+
+[directory]
+style = "#7aa2f7"
+truncation_length = 3
+truncate_to_repo = false
+format = "[$path]($style)"
+
+[git_branch]
+style = "#bb9af7"
+format = " [$branch]($style)"
+
+# One "*" for any uncommitted change. Symbols are zero-width so the group
+# shows only when something is dirty, without listing what.
+[git_status]
+style = "#bb9af7"
+format = "([*$all_status]($style))"
+conflicted = "​"
+deleted = "​"
+modified = "​"
+renamed = "​"
+staged = "​"
+typechanged = "​"
+untracked = "​"
+stashed = ""
+ahead = ""
+behind = ""
+diverged = ""
+
+[cmd_duration]
+min_time = 3_000
+style = "#565f89"
+format = " [took $duration]($style)"
+
+[character]
+success_symbol = " [❯](#9ece6a)"
+error_symbol = " [❯](#f7768e)"

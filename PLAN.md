@@ -115,7 +115,7 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 1. [x] Skeleton, `ws` CLI, bootstrap, starter modules/profiles
 2. [x] VM: `ws vm base` + `ws vm fresh` green, Hyprland (Lua config) + Quickshell bar running
 2a. [ ] Snapshots module: snapper + snap-pac + bootable snapshots
-3. [ ] Port zsh, kitty, nvim, git, fzf, scripts from `~/.dotfiles`
+3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, kitty → ghostty ✓; nvim, git, scripts left
 4. [ ] Hyprland config + Quickshell bar/launcher/notifications
 5. [ ] Theme tokens + generators
 6. [ ] Action catalog generator + help overlay

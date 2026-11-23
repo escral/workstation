@@ -106,6 +106,12 @@ cmd_drift() {
     read_list "$WS_ROOT/modules/$m/aur"
   done | sort -u)
   comm -23 <(printf '%s\n' "$wanted") <(pacman -Qq | sort -u) | sed 's/^/    /'
+
+  log "lines added to shell loaders (installers)"
+  local f
+  for f in "$HOME/.zshenv" "$HOME/.zshrc"; do
+    [[ -f $f ]] && tail -n +2 "$f" | sed '/^[[:space:]]*$/d' | sed "s|^|    ${f#"$HOME"/}: |"
+  done
 }
 
 cmd_profile() {

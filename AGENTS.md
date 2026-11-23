@@ -41,6 +41,8 @@ vm/              QEMU test harness
   `hyprland.conf` is ignored.
 - **Bindings live with their module**: `home/.config/hypr/binds.d/<topic>.lua`.
   One explicit `hl.bind` line per binding; loops only for workspace numbers.
+- **Environment goes in `home/.config/env.d/NN-name.sh`** (POSIX sh, `ws_path`
+  for PATH). Shells and the desktop session (IDEs) both load it.
 - **No secrets in git.** The repo is public. Secrets come from Bitwarden; app
   state comes from the restic backup.
 - **Test in the VM**, never by installing on the host.

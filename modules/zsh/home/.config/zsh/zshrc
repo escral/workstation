@@ -1,0 +1,31 @@
+export ZSH=/usr/share/oh-my-zsh
+# Same custom dir as a standard install, so tools that add completions or
+# plugins there (tmg completion --install) keep working.
+ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
+ZSH_CACHE_DIR="$HOME/.cache/oh-my-zsh"
+DISABLE_AUTO_UPDATE=true      # updated by pacman
+ZSH_THEME=""                  # starship draws the prompt
+plugins=(git)
+
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+
+# Modules: what oh-my-zsh must see before it starts (plugins, fpath).
+for f in ~/.config/zsh/conf.d/*.pre.zsh(N); do source $f; done
+
+source $ZSH/oh-my-zsh.sh
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# After oh-my-zsh, so these win over plugin aliases (e.g. git's `gc`).
+source ~/.config/zsh/aliases.zsh
+source ~/.config/zsh/functions.zsh
+for f in ~/.config/zsh/conf.d/*.zsh~*.pre.zsh(N); do source $f; done
+unset f
+
+bindkey '\t'   autosuggest-accept   # Tab        → accept suggestion
+bindkey '\e'   autosuggest-clear    # Esc        → clear suggestion
+bindkey '^ '   autosuggest-fetch    # Ctrl+Space → fetch suggestion
+bindkey '^[[Z' complete-word        # Shift+Tab  → complete word
+
+eval "$(starship init zsh)"
+
+[[ -f ~/.config/zsh/local.zsh ]] && source ~/.config/zsh/local.zsh

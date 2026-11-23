@@ -1,5 +1,6 @@
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Networking
 import Quickshell.Services.Pipewire
 import QtQuick
 
@@ -106,21 +107,26 @@ PanelWindow {
         // Volume itself shows in the OSD; the bar only warns that sound is off.
         PwObjectTracker { objects: [Pipewire.defaultAudioSink] }
 
-        Text {
-            readonly property bool muted: Pipewire.defaultAudioSink?.audio?.muted ?? false
+        Row {
+            anchors { right: date.left; rightMargin: 12; top: parent.top; bottom: parent.bottom }
+            spacing: 10
 
-            anchors { right: date.left; rightMargin: 12; verticalCenter: parent.verticalCenter }
-            text: "\u{F075F}"
-            color: Theme.red
-            font { family: Theme.font; pointSize: Theme.fontSize + 2 }
-            opacity: muted ? 1 : 0
-            scale: muted ? 1 : 0.6
-            visible: opacity > 0
-            Behavior on opacity { NumberAnimation { duration: 160 } }
-            Behavior on scale { NumberAnimation { duration: 260; easing.type: Easing.OutBack } }
+            // Red with no network at all, orange when connected but the
+            // internet is out of reach (no route, or a captive portal).
+            Indicator {
+                readonly property int connectivity: Networking.connectivity
+                active: connectivity === NetworkConnectivity.None
+                    || connectivity === NetworkConnectivity.Limited
+                    || connectivity === NetworkConnectivity.Portal
+                color: connectivity === NetworkConnectivity.None ? Theme.red : Theme.orange
+                text: "\u{F0A8E}"
+                onClicked: Quickshell.execDetached(["ghostty", "+new-window", "-e", "nmtui"])
+            }
 
-            TapHandler {
-                onTapped: Pipewire.defaultAudioSink.audio.muted = false
+            Indicator {
+                active: Pipewire.defaultAudioSink?.audio?.muted ?? false
+                text: "\u{F075F}"
+                onClicked: Pipewire.defaultAudioSink.audio.muted = false
             }
         }
 

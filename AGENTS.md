@@ -64,7 +64,8 @@ vm/              QEMU test harness
 
 - Login: your user, password `ws`. The window grabs the keyboard while the
   pointer is over it, so Super combos reach Hyprland, not the host WM.
-  Ctrl+Alt+G toggles the grab manually.
+  Ctrl+Alt+G toggles the grab manually. On an NVIDIA host the window is SDL
+  (GTK+GL renders black there) and grabs on click instead.
 - `hyprctl` over ssh needs
   `HYPRLAND_INSTANCE_SIGNATURE=$(ls $XDG_RUNTIME_DIR/hypr | head -1)`.
 - Hyprland changes: `ws vm sync` (reloads and prints config errors).

@@ -78,6 +78,11 @@ cmd_check() {
 qemu_boot() {
   local disk=$1; shift
   local accel=(-accel kvm -cpu host) display=(-device virtio-vga-gl -display gtk,gl=on,grab-on-hover=on -name "workstation VM")
+  # GTK+GL shows only black on the proprietary NVIDIA driver; SDL works there
+  # but grabs the keyboard on click instead of hover.
+  if [[ -e /proc/driver/nvidia ]]; then
+    display=(-device virtio-vga-gl -display sdl,gl=on -name "workstation VM")
+  fi
   # TCG is fine for headless install tests, far too slow for Hyprland.
   if ! has_kvm; then
     warn "no KVM: using TCG software emulation (slow)"

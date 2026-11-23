@@ -4,5 +4,8 @@
 set -euo pipefail
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
+for rule in ${FIREWALL_ALLOW:-}; do
+  sudo ufw allow "$rule"
+done
 sudo ufw --force enable
 sudo systemctl enable --now ufw.service

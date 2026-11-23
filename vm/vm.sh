@@ -9,6 +9,7 @@ BASE=$VM_DIR/base.qcow2
 FRESH=$VM_DIR/fresh.qcow2
 ISO=$VM_DIR/archlinux-x86_64.iso
 KEY=$VM_DIR/id_ed25519
+QMP=$VM_DIR/qmp.sock
 MIRROR=${WS_VM_MIRROR:-https://geo.mirror.pkgbuild.com/iso/latest}
 SSH_PORT=${WS_VM_SSH_PORT:-2222}
 SEED_PORT=${WS_VM_SEED_PORT:-8471}
@@ -26,6 +27,7 @@ usage: ws vm <command>
   base     build base.qcow2 unattended (downloads Arch ISO once)
   fresh    reset overlay to clean base, boot, run boot.sh from committed repo
   run      boot the current overlay as-is (keeps state)
+  stop     ACPI shutdown of the running VM
   sync     copy working tree (incl. uncommitted) into running VM, run ws install
   ssh      shell into running VM
 
@@ -89,6 +91,7 @@ qemu_boot() {
     "${display[@]}" \
     -device qemu-xhci -device usb-tablet \
     -virtfs local,path="$WS_ROOT",mount_tag=ws,security_model=none,readonly=on \
+    -qmp unix:"$QMP",server=on,wait=off \
     "$@"
 }
 
@@ -168,6 +171,20 @@ cmd_run() {
   qemu_boot "$FRESH"
 }
 
+cmd_stop() {
+  [[ -S $QMP ]] || die "no running VM"
+  python3 - "$QMP" <<'PY'
+import json, socket, sys
+s = socket.socket(socket.AF_UNIX)
+s.connect(sys.argv[1])
+f = s.makefile("rw")
+f.readline()
+for cmd in ("qmp_capabilities", "system_powerdown"):
+    f.write(json.dumps({"execute": cmd}) + "\n"); f.flush(); f.readline()
+PY
+  log "shutdown requested"
+}
+
 cmd_sync() {
   log "copying working tree into VM:~/workstation"
   tar -C "$WS_ROOT" --exclude=.vm --exclude=.git -cf - . \
@@ -188,6 +205,7 @@ main() {
     base)  cmd_base ;;
     fresh) cmd_fresh ;;
     run)   cmd_run ;;
+    stop)  cmd_stop ;;
     sync)  cmd_sync ;;
     ssh)   cmd_ssh "$@" ;;
     *)     usage ;;

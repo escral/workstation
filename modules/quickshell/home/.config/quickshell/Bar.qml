@@ -18,7 +18,7 @@ PanelWindow {
 
     anchors { bottom: true; left: true; right: true }
     margins { bottom: Theme.gap; left: Theme.gap; right: Theme.gap }
-    implicitHeight: 32
+    implicitHeight: Theme.barHeight
     color: "transparent"
 
     Rectangle {

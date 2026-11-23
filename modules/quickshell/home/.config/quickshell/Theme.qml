@@ -28,4 +28,5 @@ Singleton {
     readonly property int fontSize: 11
     readonly property int radius: 10
     readonly property int gap: 8
+    readonly property int barHeight: 32
 }

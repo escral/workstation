@@ -3,6 +3,7 @@ import QtQuick
 
 ShellRoot {
     Lock {}
+    Notifications {}
 
     Variants {
         model: Quickshell.screens

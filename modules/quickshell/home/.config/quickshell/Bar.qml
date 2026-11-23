@@ -8,6 +8,11 @@ PanelWindow {
     id: bar
 
     readonly property var monitor: Hyprland.monitorFor(screen)
+
+    function levelColor(level) {
+        return level >= 2 ? Theme.red : Theme.orange;
+    }
+
     // Keyed by the workspace names hyprland.lua sets; others show their name,
     // which for unnamed workspaces is the number.
     readonly property var icons: ({
@@ -108,8 +113,33 @@ PanelWindow {
         PwObjectTracker { objects: [Pipewire.defaultAudioSink] }
 
         Row {
-            anchors { right: date.left; rightMargin: 12; top: parent.top; bottom: parent.bottom }
-            spacing: 10
+            anchors { right: date.left; rightMargin: 24; top: parent.top; bottom: parent.bottom }
+            spacing: 16
+
+            Indicator {
+                active: Resources.cpuLevel > 0
+                color: bar.levelColor(Resources.cpuLevel)
+                icon: "\u{F04C5}"
+                label: `${Math.round(Resources.cpu)}%`
+                detail: Resources.cpuHog
+                onClicked: Quickshell.execDetached(["ghostty", "+new-window", "-e", "btop"])
+            }
+
+            Indicator {
+                active: Resources.memLevel > 0
+                color: bar.levelColor(Resources.memLevel)
+                icon: "\u{F035B}"
+                label: `${Math.round(Resources.memUsed)}%`
+                detail: Resources.memHog
+                onClicked: Quickshell.execDetached(["ghostty", "+new-window", "-e", "btop"])
+            }
+
+            Indicator {
+                active: Resources.diskLevel > 0
+                color: bar.levelColor(Resources.diskLevel)
+                icon: "\u{F02CA}"
+                label: `${(Resources.diskFree / 2 ** 30).toFixed(Resources.diskFree < 10 * 2 ** 30 ? 1 : 0)}G<font color="${Theme.muted}"> free</font>`
+            }
 
             // Red with no network at all, orange when connected but the
             // internet is out of reach (no route, or a captive portal).
@@ -119,13 +149,13 @@ PanelWindow {
                     || connectivity === NetworkConnectivity.Limited
                     || connectivity === NetworkConnectivity.Portal
                 color: connectivity === NetworkConnectivity.None ? Theme.red : Theme.orange
-                text: "\u{F0A8E}"
+                icon: "\u{F0A8E}"
                 onClicked: Quickshell.execDetached(["ghostty", "+new-window", "-e", "nmtui"])
             }
 
             Indicator {
                 active: Pipewire.defaultAudioSink?.audio?.muted ?? false
-                text: "\u{F075F}"
+                icon: "\u{F075F}"
                 onClicked: Pipewire.defaultAudioSink.audio.muted = false
             }
         }

@@ -1,4 +1,9 @@
 theme = TokyoNight Night
+# Hyprland blurs what shows through; see decoration in hyprland.lua.
+background-opacity = 0.85
+custom-shader = shaders/hide-unfocused-cursor.glsl
+# The shader is static; animating would redraw every frame for nothing.
+custom-shader-animation = false
 font-family = FiraCode Nerd Font
 font-size = 11
 window-padding-x = 8

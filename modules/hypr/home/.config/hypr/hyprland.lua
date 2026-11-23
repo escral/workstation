@@ -13,6 +13,11 @@ hl.config({
     },
     decoration = {
         rounding = 10,
+        -- Focus reads from brightness, not only the border.
+        inactive_opacity = 0.92,
+        dim_inactive = true,
+        dim_strength = 0.12,
+        blur = { enabled = true, size = 8, passes = 3 },
     },
     input = {
         kb_layout = "us,ru",

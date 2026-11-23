@@ -2,6 +2,8 @@ import Quickshell
 import QtQuick
 
 ShellRoot {
+    Lock {}
+
     Variants {
         model: Quickshell.screens
 

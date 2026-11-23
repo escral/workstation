@@ -9,3 +9,7 @@ command = "tuigreet --time --remember --remember-session --asterisks --cmd 'uwsm
 user = "greeter"
 CONF
 sudo systemctl enable greetd.service
+
+# Arch locks the account for 10 minutes after 3 wrong passwords, which a few
+# typos on the lock screen hit easily.
+sudo sed -i -E 's/^#? *deny = .*/deny = 10/' /etc/security/faillock.conf

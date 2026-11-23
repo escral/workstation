@@ -49,6 +49,11 @@ hl.config({
         force_default_wallpaper = 0,
         disable_hyprland_logo = true,
         disable_splash_rendering = true,
+        -- The Quickshell lock screen fades over the desktop, so Hyprland must
+        -- draw what is under its transparent surface.
+        session_lock_xray = true,
+        -- A restarted Quickshell can take the lock over again after a crash.
+        allow_session_lock_restore = true,
     },
 })
 

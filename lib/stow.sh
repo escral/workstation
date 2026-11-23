@@ -1,8 +1,4 @@
 # shellcheck shell=bash
-# Stow a `home/` directory into $HOME. Real files that would conflict are
-# moved to a timestamped backup first, so a fresh machine never blocks on
-# distro-default dotfiles (.bashrc etc).
-
 stow_home() {
   local pkg_dir=$1 label=$2
   [[ -d $pkg_dir/home ]] || return 0
@@ -18,6 +14,8 @@ unstow_home() {
   stow --no-folding --delete -d "$pkg_dir" -t "$HOME" home
 }
 
+# Move real files out of the way so distro defaults (.bashrc etc) never
+# block stow on a fresh machine.
 _backup_conflicts() {
   local src=$1 rel target backup_root
   backup_root="$WS_STATE/backup/$(date +%Y%m%d-%H%M%S)"

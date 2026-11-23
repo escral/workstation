@@ -1,2 +1,2 @@
-# checkupdates (update notifier source), paccache (cache cleanup)
+# provides checkupdates, paccache
 pacman-contrib

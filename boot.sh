@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# Bootstrap on a bare Arch install (after archinstall, logged in as your user):
-#   curl -fsSL https://raw.githubusercontent.com/escral/workstation/master/boot.sh | bash
-# Env overrides: WS_REPO, WS_ROOT, WS_PROFILE, WS_BRANCH
 set -euo pipefail
 
 WS_REPO=${WS_REPO:-https://github.com/escral/workstation.git}

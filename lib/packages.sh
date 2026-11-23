@@ -10,7 +10,6 @@ ensure_paru() {
   rm -rf "$tmp"
 }
 
-# Install pacman + AUR packages for the given modules.
 install_packages() {
   local m pac=() aur=()
   for m in "$@"; do
@@ -28,7 +27,6 @@ install_packages() {
   fi
 }
 
-# Every package any module declares (enabled or not).
 all_declared_packages() {
   local f
   for f in "$WS_ROOT"/modules/*/packages "$WS_ROOT"/modules/*/aur; do

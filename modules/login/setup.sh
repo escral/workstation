@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# greetd + tuigreet. Default: Hyprland under uwsm; other sessions selectable (F3).
 set -euo pipefail
 sudo tee /etc/greetd/config.toml >/dev/null <<'CONF'
 [terminal]

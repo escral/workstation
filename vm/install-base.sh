@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# Runs as root inside the Arch live ISO (over ssh from `ws vm base`).
-# Installs a minimal Arch onto /dev/vda: BIOS/GRUB, btrfs with the usual
-# subvolumes (same layout archinstall uses), one sudo user with ssh key.
 # Test VM only: user password is "ws" and sudo needs no password.
 set -euo pipefail
 

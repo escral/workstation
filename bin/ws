@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# ws — workstation CLI.
 set -euo pipefail
 
 WS_ROOT="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)"
@@ -24,7 +23,6 @@ usage: ws <command> [args]
 USAGE
 }
 
-# Resolve profile: explicit arg > saved > ask.
 resolve_profile() {
   local p=${1:-$(current_profile || true)}
   [[ -n $p ]] || die "no profile set. Use: ws install --profile <$(list_profiles | paste -sd'|')>"

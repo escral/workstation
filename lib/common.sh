@@ -1,5 +1,4 @@
 # shellcheck shell=bash
-# Shared helpers. Sourced by bin/ws and module hooks.
 
 WS_ROOT="${WS_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 WS_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/workstation"
@@ -19,21 +18,16 @@ die()  { printf '%serror:%s %s\n' "$_c_red" "$_c_off" "$*" >&2; exit 1; }
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
-# Print non-empty, non-comment lines of a list file (packages, aur, ...).
 read_list() {
   [[ -f $1 ]] || return 0
   sed -e 's/#.*//' -e 's/[[:space:]]*$//' -e '/^[[:space:]]*$/d' "$1"
 }
 
-# ---- profiles -------------------------------------------------------------
-
 current_profile() {
   [[ -f $WS_CONFIG/profile ]] && cat "$WS_CONFIG/profile"
 }
 
-# Load a profile and its `extends` chain (parents first).
-# Sets: modules (array, deduped), WS_PROFILE_CHAIN, and exports every flag
-# the profile files define (GPU, AI_TIER, ...).
+# Exports every variable a profile file sets, so flags reach setup.sh hooks.
 load_profile() {
   modules=()
   WS_PROFILE_CHAIN=()

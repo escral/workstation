@@ -1,12 +1,4 @@
 #!/usr/bin/env bash
-# VM harness: test a full install without touching the real machine.
-#
-#   base.qcow2   clean minimal Arch (btrfs, sshd, sudo user), built unattended
-#   fresh.qcow2  throwaway overlay on top of base; `ws vm fresh` resets it
-#
-# Host needs only QEMU + python3. KVM strongly recommended; without it QEMU
-# falls back to software emulation (TCG): fine for headless install tests,
-# far too slow for a usable Hyprland session.
 set -euo pipefail
 
 WS_ROOT="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)"
@@ -79,10 +71,10 @@ cmd_check() {
   ((ok)) || die "host not ready"
 }
 
-# Boot a disk. Extra args are appended (e.g. -cdrom).
 qemu_boot() {
   local disk=$1; shift
   local accel=(-accel kvm -cpu host) display=(-device virtio-vga-gl -display gtk,gl=on)
+  # TCG is fine for headless install tests, far too slow for Hyprland.
   if ! has_kvm; then
     warn "no KVM: using TCG software emulation (slow)"
     accel=(-accel tcg -cpu max)

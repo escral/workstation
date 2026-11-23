@@ -1,5 +1,3 @@
-# Only what the workstation layer itself needs to operate (ws, stow, paru).
-# Features — even basic ones like network or audio — are modules.
 git
 stow
 curl

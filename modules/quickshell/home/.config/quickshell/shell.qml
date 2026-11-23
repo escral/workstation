@@ -1,4 +1,3 @@
-// Placeholder bar: proves Quickshell runs. Real shell comes later.
 import Quickshell
 import QtQuick
 

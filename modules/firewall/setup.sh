@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Deny incoming, allow outgoing. Note: Docker publishes ports by writing
-# iptables rules directly and bypasses ufw — bind containers to 127.0.0.1.
+# Docker writes iptables rules directly and bypasses ufw: bind published
+# container ports to 127.0.0.1.
 set -euo pipefail
 sudo ufw default deny incoming
 sudo ufw default allow outgoing

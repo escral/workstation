@@ -26,7 +26,7 @@ workstation. Not a distro — a layer on top of Arch.
 | Theme | One token file → generated configs for every app | Theme switch = one change |
 | Bindings | Action catalog (`actions.toml` per module) generates hypr/kitty bind files, help overlay, launcher catalog | One source of truth |
 | Profiles | `profiles/<name>/` = modules + flags + overlay files (monitors, autostart, peripherals) | Whole-machine setup, not only hardware |
-| Testing | QEMU VM with virgl; `ws vm fresh` = clean snapshot + full bootstrap | See a reinstall without reinstalling; catch drift |
+| Testing | QEMU VM with virgl. `ws vm base` builds a minimal btrfs Arch image unattended (cloud-init seed over HTTP → ssh into live ISO → `vm/install-base.sh`); `ws vm fresh` = clean overlay + full bootstrap | See a reinstall without reinstalling; catch drift. Host needs only QEMU + python3; TCG fallback without KVM (headless only) |
 | AI | Small specialized local models (embeddings, whisper, piper, reranker), GPU tier optional via profile flag | Must run on CPU-only machines |
 
 ## Layout
@@ -112,7 +112,7 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 ## Roadmap
 
 1. [x] Skeleton, `ws` CLI, bootstrap, starter modules/profiles
-2. [ ] VM: enable VT-x in BIOS, build base image (btrfs), `ws vm fresh` green
+2. [ ] VM: enable VT-x in BIOS, `ws vm base` + `ws vm fresh` green (automation written, untested)
 2a. [ ] Snapshots module: snapper + snap-pac + bootable snapshots
 3. [ ] Port zsh, kitty, nvim, git, fzf, scripts from `~/.dotfiles`
 4. [ ] Hyprland config + Quickshell bar/launcher/notifications

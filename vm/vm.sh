@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # VM harness: test a full install without touching the real machine.
 #
-#   base.qcow2   clean Arch after archinstall (built once, by hand: `ws vm base`)
+#   base.qcow2   clean minimal Arch (btrfs, sshd, sudo user), built unattended
 #   fresh.qcow2  throwaway overlay on top of base; `ws vm fresh` resets it
 #
-# Runs on any Linux host with KVM + QEMU (works from the current Ubuntu box).
+# Host needs only QEMU + python3. KVM strongly recommended; without it QEMU
+# falls back to software emulation (TCG): fine for headless install tests,
+# far too slow for a usable Hyprland session.
 set -euo pipefail
 
 WS_ROOT="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)"
@@ -13,89 +15,144 @@ source "$WS_ROOT/lib/common.sh"
 VM_DIR=${WS_VM_DIR:-$WS_ROOT/.vm}
 BASE=$VM_DIR/base.qcow2
 FRESH=$VM_DIR/fresh.qcow2
-ISO=$VM_DIR/archlinux.iso
+ISO=$VM_DIR/archlinux-x86_64.iso
+KEY=$VM_DIR/id_ed25519
+MIRROR=${WS_VM_MIRROR:-https://geo.mirror.pkgbuild.com/iso/latest}
 SSH_PORT=${WS_VM_SSH_PORT:-2222}
+SEED_PORT=${WS_VM_SEED_PORT:-8471}
 VM_USER=${WS_VM_USER:-$USER}
 MEM=${WS_VM_MEM:-8G}
 CPUS=${WS_VM_CPUS:-4}
 DISK_SIZE=${WS_VM_DISK:-40G}
+HEADLESS=${WS_VM_HEADLESS:-0}
 
 usage() {
   cat <<USAGE
 usage: ws vm <command>
 
-  check    verify KVM / QEMU / GL on this host
-  base     download Arch ISO, create base disk, boot installer (one-time, manual)
+  check    verify KVM / QEMU on this host
+  base     build base.qcow2 unattended (downloads Arch ISO once)
   fresh    reset overlay to clean base, boot, run boot.sh from committed repo
   run      boot the current overlay as-is (keeps state)
   sync     copy working tree (incl. uncommitted) into running VM, run ws install
   ssh      shell into running VM
+
+env: WS_VM_HEADLESS=1 (no window), WS_VM_MEM, WS_VM_CPUS, WS_VM_DISK,
+     WS_VM_SSH_PORT, WS_VM_USER
 USAGE
 }
 
-ssh_vm() {
-  ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-      -o LogLevel=ERROR "$VM_USER@localhost" "$@"
+has_kvm() { [[ -r /dev/kvm && -w /dev/kvm ]]; }
+
+ssh_as() {
+  local user=$1; shift
+  ssh -p "$SSH_PORT" -i "$KEY" -o IdentitiesOnly=yes \
+      -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+      -o LogLevel=ERROR "$user@localhost" "$@"
 }
+ssh_vm() { ssh_as "$VM_USER" "$@"; }
 
 wait_ssh() {
-  log "waiting for ssh on :$SSH_PORT"
-  local i
-  for i in $(seq 1 120); do
-    ssh_vm -o ConnectTimeout=2 true 2>/dev/null && return 0
-    sleep 2
+  local user=$1 qpid=$2 tries=${3:-400}
+  log "waiting for ssh ($user@localhost:$SSH_PORT)"
+  while ((tries--)); do
+    kill -0 "$qpid" 2>/dev/null || die "QEMU exited before ssh came up"
+    ssh_as "$user" -o ConnectTimeout=3 -o BatchMode=yes true 2>/dev/null && return 0
+    sleep 3
   done
   die "VM did not come up on ssh"
 }
 
+ensure_key() {
+  mkdir -p "$VM_DIR"
+  [[ -f $KEY ]] || ssh-keygen -q -t ed25519 -N '' -C ws-vm -f "$KEY"
+}
+
 cmd_check() {
   local ok=1
-  if [[ -e /dev/kvm ]]; then info "kvm: ok"
-  else warn "/dev/kvm missing — enable VT-x/AMD-V (SVM) in BIOS"; ok=0; fi
-  if [[ -r /dev/kvm && -w /dev/kvm ]] || [[ ! -e /dev/kvm ]]; then :
-  else warn "no access to /dev/kvm — add yourself to the kvm group"; ok=0; fi
+  if has_kvm; then info "kvm: ok"
+  elif [[ -e /dev/kvm ]]; then warn "no access to /dev/kvm — sudo usermod -aG kvm $USER, re-login"
+  else warn "/dev/kvm missing — enable VT-x / SVM in BIOS (falls back to slow TCG)"; fi
   have qemu-system-x86_64 && info "qemu: ok" || { warn "qemu-system-x86_64 missing"; ok=0; }
   have qemu-img && info "qemu-img: ok" || { warn "qemu-img missing"; ok=0; }
-  ((ok)) && log "host ready" || die "host not ready"
+  have python3 && info "python3: ok" || { warn "python3 missing (serves cloud-init seed)"; ok=0; }
+  ((ok)) || die "host not ready"
 }
 
 # Boot a disk. Extra args are appended (e.g. -cdrom).
 qemu_boot() {
   local disk=$1; shift
+  local accel=(-accel kvm -cpu host) display=(-device virtio-vga-gl -display gtk,gl=on)
+  if ! has_kvm; then
+    warn "no KVM: using TCG software emulation (slow)"
+    accel=(-accel tcg -cpu max)
+  fi
+  if ((HEADLESS)) || ! has_kvm; then
+    display=(-device virtio-vga -display none)
+  fi
   qemu-system-x86_64 \
-    -enable-kvm -cpu host -smp "$CPUS" -m "$MEM" \
+    "${accel[@]}" -smp "$CPUS" -m "$MEM" \
     -drive file="$disk",if=virtio,format=qcow2 \
-    -nic user,model=virtio-net-pci,hostfwd=tcp::"$SSH_PORT"-:22 \
-    -device virtio-vga-gl -display gtk,gl=on \
+    -nic user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:"$SSH_PORT"-:22 \
+    "${display[@]}" \
     -device qemu-xhci -device usb-tablet \
-    -audiodev pipewire,id=snd0 -device ich9-intel-hda -device hda-output,audiodev=snd0 \
     -virtfs local,path="$WS_ROOT",mount_tag=ws,security_model=none,readonly=on \
     "$@"
 }
 
+fetch_iso() {
+  [[ -f $ISO ]] && return 0
+  log "downloading Arch ISO from $MIRROR"
+  curl -fL --progress-bar -o "$ISO.part" "$MIRROR/archlinux-x86_64.iso"
+  log "verifying checksum"
+  local want got
+  want=$(curl -fsSL "$MIRROR/sha256sums.txt" | awk '$2 ~ /archlinux-x86_64\.iso$/ {print $1}')
+  got=$(sha256sum "$ISO.part" | cut -d' ' -f1)
+  [[ -n $want && $want == "$got" ]] || { rm -f "$ISO.part"; die "ISO checksum mismatch"; }
+  mv "$ISO.part" "$ISO"
+}
+
+# cloud-init NoCloud seed served over HTTP: the live ISO picks it up via
+# SMBIOS serial and installs our key for root, so we can ssh in.
+start_seed_server() {
+  local seed=$VM_DIR/seed
+  mkdir -p "$seed"
+  printf 'instance-id: ws-vm-%s\nlocal-hostname: archiso\n' "$(date +%s)" >"$seed/meta-data"
+  cat >"$seed/user-data" <<EOF
+#cloud-config
+users:
+  - name: root
+    ssh_authorized_keys:
+      - $(cat "$KEY.pub")
+EOF
+  python3 -m http.server --bind 127.0.0.1 --directory "$seed" "$SEED_PORT" >/dev/null 2>&1 &
+  SEED_PID=$!
+}
+
 cmd_base() {
   cmd_check
-  mkdir -p "$VM_DIR"
-  if [[ ! -f $ISO ]]; then
-    log "downloading Arch ISO"
-    curl -fL -o "$ISO" https://geo.mirror.pkgbuild.com/iso/latest/archlinux-x86_64.iso
-  fi
   [[ -f $BASE ]] && die "$BASE exists. Delete it to rebuild."
-  qemu-img create -f qcow2 "$BASE" "$DISK_SIZE"
-  cat <<MSG
+  ensure_key
+  fetch_iso
+  rm -f "$BASE.part"
+  qemu-img create -q -f qcow2 "$BASE.part" "$DISK_SIZE"
 
-In the installer:
-  1. archinstall — bootloader: grub (BIOS), network: NetworkManager,
-     user: $VM_USER with sudo, filesystem: btrfs (default subvolumes),
-     profile: minimal, extra packages: openssh
-  2. reboot into the installed system, log in, then:
-       sudo systemctl enable --now sshd
-       echo '$VM_USER ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/ws-vm
-       mkdir -p ~/.ssh && echo '<your host pubkey>' >> ~/.ssh/authorized_keys
-  3. sudo poweroff — base.qcow2 is now the clean snapshot.
+  start_seed_server
+  local qpid
+  qemu_boot "$BASE.part" -cdrom "$ISO" -boot d \
+    -smbios "type=1,serial=ds=nocloud;s=http://10.0.2.2:$SEED_PORT/" &
+  qpid=$!
+  trap 'kill $SEED_PID $qpid 2>/dev/null || true' EXIT
 
-MSG
-  qemu_boot "$BASE" -cdrom "$ISO" -boot once=d
+  wait_ssh root "$qpid"
+  log "installing minimal Arch into base image"
+  ssh_as root bash -s -- "$VM_USER" "'$(cat "$KEY.pub")'" <"$WS_ROOT/vm/install-base.sh"
+  ssh_as root poweroff || true
+  wait "$qpid" || true
+  trap - EXIT
+  kill "$SEED_PID" 2>/dev/null || true
+  mv "$BASE.part" "$BASE"
+  log "base image ready: $BASE (user $VM_USER, password 'ws')"
 }
 
 cmd_fresh() {
@@ -103,13 +160,14 @@ cmd_fresh() {
   log "resetting overlay"
   rm -f "$FRESH"
   qemu-img create -q -f qcow2 -b "$BASE" -F qcow2 "$FRESH"
+  local qpid
   qemu_boot "$FRESH" &
-  local qpid=$!
-  wait_ssh
+  qpid=$!
+  wait_ssh "$VM_USER" "$qpid"
   log "running boot.sh from committed repo (profile: vm)"
   ssh_vm -t 'sudo mkdir -p /mnt/ws && sudo mount -t 9p -o trans=virtio,version=9p2000.L ws /mnt/ws \
     && WS_REPO=/mnt/ws WS_PROFILE=vm bash /mnt/ws/boot.sh'
-  log "install finished — reboot the VM to land in Hyprland (ws vm ssh -- sudo reboot)"
+  log "install finished — 'ws vm ssh -- sudo reboot' to land in Hyprland"
   wait "$qpid"
 }
 

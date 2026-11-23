@@ -60,6 +60,12 @@ vm/              QEMU test harness
 - Login: your user, password `ws`. Ctrl+Alt+G releases the mouse.
 - `hyprctl` over ssh needs
   `HYPRLAND_INSTANCE_SIGNATURE=$(ls $XDG_RUNTIME_DIR/hypr | head -1)`.
-- Hyprland changes: `ws vm sync`, then `hyprctl reload` and `hyprctl configerrors`.
+- Hyprland changes: `ws vm sync` (reloads and prints config errors).
+- Quickshell changes: restart it with
+  `pkill quickshell; hyprctl dispatch 'hl.dsp.exec_cmd("uwsm app -- quickshell")'`.
+  Current log: newest `$XDG_RUNTIME_DIR/quickshell/by-id/*/log.log`
+  (`quickshell log` may show an older instance).
+- The owner may be using the VM window at the same time. Windows appearing
+  or disappearing may be them.
 - The firewall blocks ssh unless the profile sets `FIREWALL_ALLOW="ssh"`
   (the vm profile does).

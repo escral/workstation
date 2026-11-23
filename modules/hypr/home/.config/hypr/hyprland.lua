@@ -8,9 +8,13 @@ hl.config({
         gaps_out = 8,
         border_size = 2,
         layout = "dwindle",
+        col = {
+            active_border = { colors = { "rgba(7aa2f7ff)", "rgba(bb9af7ff)" }, angle = 45 },
+            inactive_border = "rgba(292e42ff)",
+        },
     },
     decoration = {
-        rounding = 8,
+        rounding = 10,
     },
     input = {
         kb_layout = "us,ru",

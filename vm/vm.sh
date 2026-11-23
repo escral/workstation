@@ -196,11 +196,16 @@ cmd_shot() {
 
 cmd_sync() {
   log "copying working tree into VM:~/workstation"
+  # Extract aside and swap: Hyprland watches its config and would reload
+  # mid-copy, hitting missing files.
   tar -C "$WS_ROOT" --exclude=.vm --exclude=.git -cf - . \
-    | ssh_vm 'mkdir -p ~/workstation \
-        && find ~/workstation -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} + \
-        && tar -C ~/workstation -xf -'
+    | ssh_vm 'set -e; rm -rf ~/.ws-new ~/.ws-old; mkdir -p ~/.ws-new ~/workstation
+        tar -C ~/.ws-new -xf -
+        [ -d ~/workstation/.git ] && mv ~/workstation/.git ~/.ws-new/
+        mv ~/workstation ~/.ws-old && mv ~/.ws-new ~/workstation && rm -rf ~/.ws-old'
   ssh_vm -t '~/workstation/bin/ws install --profile vm'
+  ssh_vm 'export HYPRLAND_INSTANCE_SIGNATURE=$(ls "$XDG_RUNTIME_DIR/hypr" 2>/dev/null | head -1)
+    [ -n "$HYPRLAND_INSTANCE_SIGNATURE" ] && hyprctl reload >/dev/null && hyprctl configerrors' || true
 }
 
 cmd_ssh() {

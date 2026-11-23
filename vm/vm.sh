@@ -29,6 +29,7 @@ usage: ws vm <command>
   run      boot the current overlay as-is (keeps state)
   stop     ACPI shutdown of the running VM
   shot     screenshot of the Hyprland session → .vm/shot.png
+  key      send key combos, e.g. ws vm key meta_l+ret ctrl+shift+ret
   sync     copy working tree (incl. uncommitted) into running VM, run ws install
   ssh      shell into running VM
 
@@ -76,7 +77,7 @@ cmd_check() {
 
 qemu_boot() {
   local disk=$1; shift
-  local accel=(-accel kvm -cpu host) display=(-device virtio-vga-gl -display gtk,gl=on)
+  local accel=(-accel kvm -cpu host) display=(-device virtio-vga-gl -display gtk,gl=on,grab-on-hover=on -name "workstation VM")
   # TCG is fine for headless install tests, far too slow for Hyprland.
   if ! has_kvm; then
     warn "no KVM: using TCG software emulation (slow)"
@@ -194,13 +195,32 @@ cmd_shot() {
   log "saved $out"
 }
 
+# Keys are QEMU qcodes: meta_l, ctrl, shift, alt, ret, esc, a, 1, slash...
+cmd_key() {
+  [[ -S $QMP ]] || die "no running VM"
+  python3 - "$QMP" "$@" <<'PY'
+import json, socket, sys, time
+s = socket.socket(socket.AF_UNIX)
+s.connect(sys.argv[1])
+f = s.makefile("rw")
+f.readline()
+def send(cmd):
+    f.write(json.dumps(cmd) + "\n"); f.flush(); f.readline()
+send({"execute": "qmp_capabilities"})
+for combo in sys.argv[2:]:
+    keys = [{"type": "qcode", "data": k} for k in combo.split("+")]
+    send({"execute": "send-key", "arguments": {"keys": keys}})
+    time.sleep(0.4)
+PY
+}
+
 cmd_sync() {
   log "copying working tree into VM:~/workstation"
   # Extract aside and swap: Hyprland watches its config and would reload
   # mid-copy, hitting missing files.
   tar -C "$WS_ROOT" --exclude=.vm --exclude=.git -cf - . \
     | ssh_vm 'set -e; rm -rf ~/.ws-new ~/.ws-old; mkdir -p ~/.ws-new ~/workstation
-        tar -C ~/.ws-new -xf -
+        tar -C ~/.ws-new --warning=no-timestamp -xf -
         [ -d ~/workstation/.git ] && mv ~/workstation/.git ~/.ws-new/
         mv ~/workstation ~/.ws-old && mv ~/.ws-new ~/workstation && rm -rf ~/.ws-old'
   ssh_vm -t '~/workstation/bin/ws install --profile vm'
@@ -223,6 +243,7 @@ main() {
     run)   cmd_run ;;
     stop)  cmd_stop ;;
     shot)  cmd_shot "$@" ;;
+    key)   cmd_key "$@" ;;
     sync)  cmd_sync ;;
     ssh)   cmd_ssh "$@" ;;
     *)     usage ;;

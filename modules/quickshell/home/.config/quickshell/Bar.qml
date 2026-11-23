@@ -29,7 +29,7 @@ PanelWindow {
                     required property var modelData
                     readonly property bool focused: modelData.focused
 
-                    width: focused ? 34 : 24
+                    width: Math.max(focused ? 34 : 24, label.implicitWidth + 16)
                     height: 22
                     radius: height / 2
                     color: modelData.urgent ? Theme.red
@@ -41,8 +41,10 @@ PanelWindow {
                     Behavior on color { ColorAnimation { duration: 160 } }
 
                     Label {
+                        id: label
                         anchors.horizontalCenter: parent.horizontalCenter
-                        text: modelData.name
+                        text: modelData.name === String(modelData.id) ? modelData.name
+                            : `${modelData.id} ${modelData.name}`
                         color: focused || modelData.urgent ? Theme.bg
                              : modelData.active ? Theme.text
                              : Theme.subtext

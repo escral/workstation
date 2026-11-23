@@ -39,6 +39,8 @@ vm/              QEMU test harness
   `~/.config/hypr/local/*.lua`.
 - **Hyprland config is Lua** (0.57+): `hyprland.lua`, API under `hl.*`.
   `hyprland.conf` is ignored.
+- **Bindings live with their module**: `home/.config/hypr/binds.d/<topic>.lua`.
+  One explicit `hl.bind` line per binding; loops only for workspace numbers.
 - **No secrets in git.** The repo is public. Secrets come from Bitwarden; app
   state comes from the restic backup.
 - **Test in the VM**, never by installing on the host.
@@ -54,10 +56,13 @@ vm/              QEMU test harness
 | `ws vm run` | boot with a window (the owner usually has it open) |
 | `ws vm sync` | push working tree into running VM, run `ws install` |
 | `ws vm shot` | screenshot of the session → `.vm/shot.png` |
+| `ws vm key <combo>...` | press keys, e.g. `meta_l+ret` (QEMU qcodes) |
 | `ws vm ssh -- <cmd>` | run a command inside |
 | `ws vm stop` | clean shutdown |
 
-- Login: your user, password `ws`. Ctrl+Alt+G releases the mouse.
+- Login: your user, password `ws`. The window grabs the keyboard while the
+  pointer is over it, so Super combos reach Hyprland, not the host WM.
+  Ctrl+Alt+G toggles the grab manually.
 - `hyprctl` over ssh needs
   `HYPRLAND_INSTANCE_SIGNATURE=$(ls $XDG_RUNTIME_DIR/hypr | head -1)`.
 - Hyprland changes: `ws vm sync` (reloads and prints config errors).

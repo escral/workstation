@@ -9,6 +9,7 @@ workstation. Not a distro — a layer on top of Arch.
 |---|---|---|
 | Base | Arch Linux (`archinstall`, then `boot.sh`) | Rolling, AUR has Hyprland/Quickshell, fast iteration |
 | Compositor | Hyprland | Biggest ecosystem; Quickshell works with it |
+| Terminal | Ghostty (trial vs kitty): background service + D-Bus ≈130ms; splits/tabs are Hyprland windows/groups. Super+Enter opens where the focused app works (Ghostty: self-split; others: deepest interactive child's cwd) | One navigation system (Super+hjkl) for everything; context-aware terminal |
 | Shell UI | Quickshell | Bar, launcher, notifications, OSD, help overlay — replaces dunst/rofi/i3status |
 | GUI fallback | nm-connection-editor (VPN/proxy), pavucontrol, blueman | Configure things by GUI when no tool exists. Full GNOME session dropped (~1GB) — revisit if needed |
 | Session | greetd + tuigreet → `uwsm start hyprland.desktop` | uwsm = systemd-managed session: clean env, apps as units, proper logout |
@@ -121,3 +122,4 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 7. [ ] Bitwarden SSH restore, restic state backup/restore
 8. [ ] AI module (embeddings search, whisper dictation, piper)
 9. [ ] Install on home PC (wipe Linux partition, keep Windows)
+10. [ ] IDE-aware Super+Enter: JetBrains (title → recentProjects.xml), VS Code/Cursor, when those modules exist

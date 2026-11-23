@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# New Ghostty window via the background instance (D-Bus, ~130ms; the CLI
+# boots GTK just to hand off). With a pid, opens where that app is working:
+# the cwd of its deepest interactive child (shell, nvim, ...).
+set -euo pipefail
+
+dir=$HOME
+if [[ -n ${1:-} ]]; then
+  pid=$1
+  # Follow the newest child that has a terminal: skips helpers like kitty's
+  # kittens, which share the parent but aren't where you work.
+  while child=$(ps -o pid=,tty= --ppid "$pid" --sort=-start_time | awk '$2 != "?" {print $1; exit}') \
+        && [[ -n $child ]]; do
+    pid=$child
+  done
+  cwd=$(readlink "/proc/$pid/cwd" || true)
+  [[ -n $cwd && $cwd != / ]] && dir=$cwd
+fi
+
+dir=${dir//\'/\\\'}  # GVariant string literal
+
+exec gdbus call --session --dest com.mitchellh.ghostty \
+  --object-path /com/mitchellh/ghostty \
+  --method org.gtk.Actions.Activate new-window-command \
+  "[<['--working-directory=$dir']>]" '{}' >/dev/null

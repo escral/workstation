@@ -27,42 +27,73 @@ PanelWindow {
         color: Qt.rgba(Theme.bg.r, Theme.bg.g, Theme.bg.b, 0.88)
         border { width: 1; color: Theme.highlight }
 
-        Row {
+        Item {
             anchors { left: parent.left; leftMargin: 6; verticalCenter: parent.verticalCenter }
-            spacing: 4
+            width: workspaces.width
+            height: 22
 
-            Repeater {
-                // Not `id > 0`: Hyprland 0.57 omits the id from its workspace
-                // list, so Quickshell reports -1 until an event fills it in.
-                model: Hyprland.workspaces.values.filter(ws => ws.monitor === bar.monitor && !ws.name.startsWith("special:"))
+            // One pill slides to the focused workspace instead of each tab
+            // fading its own background, so a switch reads as one motion.
+            Rectangle {
+                id: indicator
+                property Item target: null
+                visible: target !== null
+                x: target ? target.x : 0
+                width: target ? target.width : 0
+                height: parent.height
+                radius: height / 2
+                color: Theme.accent
 
-                Rectangle {
-                    required property var modelData
-                    readonly property bool focused: modelData.focused
+                Behavior on x { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+                Behavior on width { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+            }
 
-                    width: Math.max(focused ? 34 : 24, label.implicitWidth + 16)
-                    height: 22
-                    radius: height / 2
-                    color: modelData.urgent ? Theme.red
-                         : focused ? Theme.accent
-                         : hover.hovered ? Theme.highlight
-                         : "transparent"
+            Row {
+                id: workspaces
+                spacing: 4
 
-                    Behavior on width { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
-                    Behavior on color { ColorAnimation { duration: 160 } }
+                Repeater {
+                    // Not `id > 0`: workspaces opened by name have no id (-1).
+                    model: Hyprland.workspaces.values.filter(ws => ws.monitor === bar.monitor && !ws.name.startsWith("special:"))
 
-                    Label {
-                        id: label
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: bar.icons[modelData.name] ?? modelData.name
-                        color: focused || modelData.urgent ? Theme.bg
-                             : modelData.active ? Theme.text
-                             : Theme.subtext
-                        font.bold: focused
+                    Rectangle {
+                        id: tab
+                        required property var modelData
+                        readonly property bool focused: modelData.focused
+
+                        onFocusedChanged: if (focused) indicator.target = tab
+                        Component.onCompleted: if (focused) indicator.target = tab
+
+                        // Same width focused or not, so switching never shifts the row.
+                        width: Math.max(28, label.implicitWidth + 16)
+                        height: 22
+                        radius: height / 2
+                        color: modelData.urgent ? Theme.red
+                             : hover.hovered && !focused ? Theme.highlight
+                             : "transparent"
+
+                        Behavior on color { ColorAnimation { duration: 150 } }
+
+                        Label {
+                            id: label
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: bar.icons[modelData.name] ?? modelData.name
+                            color: focused || modelData.urgent ? Theme.bg
+                                 : modelData.active ? Theme.text
+                                 : Theme.subtext
+
+                            Behavior on color { ColorAnimation { duration: 150; easing.type: Easing.OutCubic } }
+                        }
+
+                        HoverHandler { id: hover }
+                        // Not modelData.activate(): it sends the pre-Lua `workspace N`
+                        // dispatch, which Hyprland 0.57 rejects. By id where there is
+                        // one: "name:AI" would open a second AI instead of workspace 3.
+                        TapHandler {
+                            onTapped: Hyprland.dispatch(`hl.dsp.focus({ workspace = ${tab.modelData.id > 0
+                                ? tab.modelData.id : JSON.stringify("name:" + tab.modelData.name)} })`)
+                        }
                     }
-
-                    HoverHandler { id: hover }
-                    TapHandler { onTapped: modelData.activate() }
                 }
             }
         }

@@ -5,6 +5,9 @@ ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
 ZSH_CACHE_DIR="$HOME/.cache/oh-my-zsh"
 DISABLE_AUTO_UPDATE=true      # updated by pacman
 ZSH_THEME=""                  # starship draws the prompt
+# oh-my-zsh's paste magic replays a paste as typed keys, each of which
+# fetches an autosuggestion; plain paste lets the clear below hold.
+DISABLE_MAGIC_FUNCTIONS=true
 plugins=(git)
 
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
@@ -25,6 +28,15 @@ bindkey '\t'   autosuggest-accept   # Tab        → accept suggestion
 bindkey '\e'   autosuggest-clear    # Esc        → clear suggestion
 bindkey '^ '   autosuggest-fetch    # Ctrl+Space → fetch suggestion
 bindkey '^[[Z' complete-word        # Shift+Tab  → complete word
+# Ghostty turns Ctrl+A + Backspace into a line clear. When another key follows
+# instead, both reach zsh, and ^A jumping to line start would be a surprise.
+bindkey -r '^A'
+
+# zsh marks pasted text in reverse video until the next key, which reads as
+# a selection.
+zle_highlight+=(paste:none)
+# A suggestion right after a paste reads like the paste doubled.
+ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(bracketed-paste)
 
 eval "$(starship init zsh)"
 

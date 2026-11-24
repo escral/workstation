@@ -11,7 +11,7 @@ Scope {
     id: root
 
     property bool open: false
-    property var entries: []
+    readonly property var entries: Catalog.entries.filter(e => e.help && e.keys.length)
     // Modifiers held besides Super, e.g. ["SHIFT"].
     property var mods: []
 
@@ -26,21 +26,6 @@ Scope {
             root.open = false;
             root.mods = [];
         }
-    }
-
-    FileView {
-        path: (Quickshell.env("XDG_CACHE_HOME") || Quickshell.env("HOME") + "/.cache") + "/ws/actions.json"
-        watchChanges: true
-        printErrors: false
-        onFileChanged: reload()
-        onLoaded: {
-            try {
-                root.entries = JSON.parse(text()).filter(e => e.help && e.keys.length);
-            } catch (e) {
-                root.entries = [];
-            }
-        }
-        onLoadFailed: root.entries = []
     }
 
     // An app's own keys only while that app is focused.
@@ -91,8 +76,8 @@ Scope {
     }
 
     // Reachable when one of its combos holds Super and every held modifier:
-    // its held caps dim and the rest show what is left to press. Rows that
-    // can't be reached dim whole rather than hide, so nothing moves while
+    // its held caps are marked and the rest show what is left to press. Rows
+    // that can't be reached dim whole rather than hide, so nothing moves while
     // modifiers come and go.
     readonly property var heldCaps: ["Super", ...mods.map(m => capNames[m])]
 

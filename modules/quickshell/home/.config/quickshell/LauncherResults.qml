@@ -180,24 +180,7 @@ Scope {
         }));
     }
 
-    // Actions come from the catalog Hyprland writes on every config load
-    // (hypr/catalog.lua); Hyprland runs them, so Lua ones work too.
-    property var catalog: []
-
-    FileView {
-        path: (Quickshell.env("XDG_CACHE_HOME") || root.home + "/.cache") + "/ws/actions.json"
-        watchChanges: true
-        printErrors: false
-        onFileChanged: reload()
-        onLoaded: {
-            try {
-                root.catalog = JSON.parse(text()).filter(e => e.launcher && e.runs);
-            } catch (e) {
-                root.catalog = [];
-            }
-        }
-        onLoadFailed: root.catalog = []
-    }
+    readonly property var catalog: Catalog.entries.filter(e => e.launcher && e.runs)
 
     function actions(q) {
         return catalog.map(e => ({
@@ -207,7 +190,7 @@ Scope {
             sub: [e.group, e.keys.join(" or ")].filter(s => s).join("  ·  "),
             glyph: e.glyph || "\u{F0E7}",
             enter: "run",
-            run: () => Quickshell.execDetached(["hyprctl", "dispatch", "ws_action(" + JSON.stringify(e.title) + ")"]),
+            run: () => Catalog.run(e.title),
         }));
     }
 

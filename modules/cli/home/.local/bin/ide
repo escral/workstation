@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Opens a project directory in the IDE that fits it: PhpStorm for composer
+# projects, WebStorm otherwise. ~/.config/ide/overrides pins directories to an
+# IDE, one "<path> <ide>" per line (~ allowed, # comments); the longest path
+# that contains the directory wins.
+set -euo pipefail
+
+dir=$(realpath "${1:-.}")
+[[ -d $dir ]] || { echo "ide: not a directory: $dir" >&2; exit 1; }
+
+ide=""
+best=0
+overrides=${IDE_OVERRIDES:-$HOME/.config/ide/overrides}
+if [[ -f $overrides ]]; then
+  while read -r path name _; do
+    [[ -z $path || $path == \#* || -z ${name:-} ]] && continue
+    path=$(realpath -m "${path/#\~/$HOME}")
+    if [[ ($dir == "$path" || $dir == "$path"/*) && ${#path} -gt $best ]]; then
+      best=${#path}
+      ide=$name
+    fi
+  done <"$overrides"
+fi
+[[ -n $ide ]] || { [[ -f $dir/composer.json ]] && ide=phpstorm || ide=webstorm; }
+
+if ! command -v "$ide" >/dev/null; then
+  notify-send "ide" "$ide isn't installed"
+  exit 1
+fi
+exec uwsm app -- "$ide" "$dir"

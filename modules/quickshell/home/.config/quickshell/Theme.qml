@@ -29,4 +29,8 @@ Singleton {
     readonly property int radius: 10
     readonly property int gap: 8
     readonly property int barHeight: 32
+
+    function alpha(c, a) {
+        return Qt.rgba(c.r, c.g, c.b, a);
+    }
 }

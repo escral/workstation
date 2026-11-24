@@ -2,3 +2,5 @@ qt6-svg
 qt6-declarative
 qt6-shadertools
 libnotify
+libqalculate
+wl-clipboard

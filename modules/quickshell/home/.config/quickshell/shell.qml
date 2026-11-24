@@ -5,6 +5,7 @@ ShellRoot {
     Lock {}
     Notifications {}
     VolumeOsd {}
+    Launcher {}
 
     Variants {
         model: Quickshell.screens

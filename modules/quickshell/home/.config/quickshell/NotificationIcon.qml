@@ -1,9 +1,10 @@
 import Quickshell
 import QtQuick
 
-// The app's own icon or image when it sends one that loads; otherwise a bell
-// that rings once, or for critical ones a warning that keeps sending out
-// rings like a beacon until the card is dealt with.
+// The image a notification carries (an avatar, a cover) when it loads; else
+// the app's glyph when we know the app; else a bell that rings once, or for
+// critical ones a warning that keeps sending out rings like a beacon until the
+// card is dealt with.
 Rectangle {
     id: plate
 
@@ -12,22 +13,31 @@ Rectangle {
     required property color tint
     // The notification is freed just before its card is, by then invisible.
     readonly property string image: n?.image ?? ""
-    readonly property string appIcon: n?.appIcon ?? ""
+    readonly property string appId: n?.desktopEntry ?? ""
+    readonly property var entry: DesktopEntries.applications.values.find(e => e.id === appId) ?? null
 
     width: 40
     height: 40
     radius: 12
-    color: Qt.rgba(tint.r, tint.g, tint.b, 0.15)
+    color: app.visible ? "transparent" : Qt.rgba(tint.r, tint.g, tint.b, 0.15)
 
     Image {
         id: picture
         anchors.fill: parent
-        anchors.margins: plate.image !== "" ? 0 : 6
-        source: plate.image !== "" ? plate.image
-            : plate.appIcon !== "" ? Quickshell.iconPath(plate.appIcon, true) : ""
+        source: plate.image
         visible: status === Image.Ready
         sourceSize { width: 80; height: 80 }
-        fillMode: plate.image !== "" ? Image.PreserveAspectCrop : Image.PreserveAspectFit
+        fillMode: Image.PreserveAspectCrop
+    }
+
+    AppGlyph {
+        id: app
+        size: plate.width
+        radius: plate.radius
+        visible: !picture.visible && known && !plate.critical
+        appId: plate.appId
+        appClass: plate.n?.appName ?? ""
+        categories: plate.entry?.categories ?? []
     }
 
     Rectangle {
@@ -53,7 +63,7 @@ Rectangle {
     Text {
         id: glyph
         anchors.centerIn: parent
-        visible: !picture.visible
+        visible: !picture.visible && !app.visible
         text: plate.critical ? "\u{F0026}" : "\u{F009A}"
         color: plate.tint
         font { family: Theme.font; pointSize: 15 }

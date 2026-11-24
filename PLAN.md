@@ -73,14 +73,14 @@ AI_TIER=gpu
 | network | NetworkManager, nm-connection-editor | all |
 | audio | pipewire, wireplumber, pavucontrol | all |
 | ssh | openssh (later: keys from Bitwarden) | all |
-| cli | fzf, ripgrep, fd, jq, unzip, man-db, btop | all |
+| cli | fzf, fzf-marks, ripgrep, fd, jq, unzip, man-db, btop, `ide` (opens a project in PhpStorm/WebStorm) | all |
 | firewall | ufw | all |
 | maintenance | pacman-contrib, paccache.timer | all |
 | login | greetd + cage running the Quickshell login screen → uwsm Hyprland | all |
 | fonts | FiraCode Nerd, Noto, emoji | all |
 | zsh | zsh + plugins, chsh (config to port) | all |
 | hypr | Hyprland, portals, polkit agent, screenshots, xdg-user-dirs | all |
-| quickshell | Bar, shader background, lock screen + idle lock/DPMS, notification popups, volume OSD, mute/offline/load indicators | all |
+| quickshell | Bar, shader background, lock screen + idle lock/DPMS, notification popups, volume OSD, mute/offline/load indicators, launcher (Super+Space all, Super+D apps, Super+P projects from fzf-marks, Super+Ctrl+P actions; also windows, calculator, web), app glyphs instead of an icon theme | all |
 | kitty | kitty (config to port) | all |
 | chrome | Google Chrome, opens on the Browser workspace | vm |
 | telegram / slack | Telegram, Slack: start with the session on the Chat workspace | vm |
@@ -109,7 +109,7 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 ## Help overlay (planned)
 
 - Hold Super ~300ms → overlay of Super binds; adding Shift filters live.
-- Leader: Super+Space → Hyprland submaps (`w` window, `s` screenshot, `a` AI...),
+- Leader: key to pick (Super+Space is the launcher) → Hyprland submaps (`w` window, `s` screenshot, `a` AI...),
   which-key popup at each step.
 
 ## Roadmap
@@ -119,10 +119,10 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 2a. [ ] Snapshots module: snapper + snap-pac + bootable snapshots
 2b. [ ] Time: NTP sync (systemd-timesyncd) and timezone per profile; the VM base image is UTC with no NTP
 3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, kitty → ghostty ✓; nvim, git, scripts left
-4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓; tray left
+4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓, launcher ✓, app glyphs ✓; tray left
 5. [ ] Theme tokens + generators
-6. [ ] Action catalog generator + help overlay
+6. [ ] Action catalog generator + help overlay; the catalog feeds the launcher's Actions
 7. [ ] Bitwarden SSH restore, restic state backup/restore
-8. [ ] AI module (embeddings search, whisper dictation, piper)
+8. [ ] AI module (embeddings search, first in the launcher; whisper dictation, piper)
 9. [ ] Install on home PC (wipe Linux partition, keep Windows)
 10. [ ] IDE-aware Super+Enter: JetBrains (title → recentProjects.xml), VS Code/Cursor, when those modules exist

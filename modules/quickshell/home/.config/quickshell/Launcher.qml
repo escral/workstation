@@ -261,7 +261,7 @@ Scope {
 
                 anchors { top: chips.bottom; topMargin: 1 }
                 width: parent.width
-                height: Math.min(contentHeight + topMargin + bottomMargin, maxHeight)
+                height: count ? Math.min(contentHeight + topMargin + bottomMargin, maxHeight) : rowHeight + topMargin + bottomMargin
                 topMargin: panel.pad
                 bottomMargin: panel.pad
                 clip: true
@@ -291,6 +291,16 @@ Scope {
                     onHovered: list.currentIndex = index
                     onActivated: fresh => root.run(item, fresh)
                 }
+            }
+
+            Text {
+                anchors.centerIn: list
+                visible: list.count === 0
+                text: root.query.trim() === "" ? "Type to search"
+                    : root.scope === 0 ? "Nothing found"
+                    : "No " + root.scopes[root.scope].toLowerCase() + " found"
+                color: Theme.muted
+                font { family: Theme.font; pixelSize: 14 }
             }
 
             Rectangle {

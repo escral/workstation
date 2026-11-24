@@ -8,17 +8,16 @@ ZSH_THEME=""                  # starship draws the prompt
 # oh-my-zsh's paste magic replays a paste as typed keys, each of which
 # fetches an autosuggestion; plain paste lets the clear below hold.
 DISABLE_MAGIC_FUNCTIONS=true
-plugins=(git)
 
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
-# Modules: what oh-my-zsh must see before it starts (plugins, fpath).
+# Modules: what oh-my-zsh must see before it starts (fpath).
 for f in ~/.config/zsh/conf.d/*.pre.zsh(N); do source $f; done
 
 source $ZSH/oh-my-zsh.sh
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
-# After oh-my-zsh, so these win over plugin aliases (e.g. git's `gc`).
+# After oh-my-zsh, so these win over its own aliases.
 source ~/.config/zsh/aliases.zsh
 source ~/.config/zsh/functions.zsh
 for f in ~/.config/zsh/conf.d/*.zsh~*.pre.zsh(N); do source $f; done

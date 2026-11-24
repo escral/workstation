@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "defaultMode": "bypassPermissions"
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "theme": "dark",
+  "enabledPlugins": {
+    "typescript-lsp@claude-plugins-official": true,
+    "caveman@caveman": true
+  },
+  "extraKnownMarketplaces": {
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
+    }
+  }
+}

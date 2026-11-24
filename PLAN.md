@@ -84,6 +84,7 @@ AI_TIER=gpu
 | hypr | Hyprland, portals, polkit agent, screenshots, xdg-user-dirs | all |
 | quickshell | Bar, shader background, lock screen + idle lock/DPMS, notification popups, volume OSD, mute/offline/load indicators, calendar popup (click the date), red attention pills for apps with unread (LauncherEntry counts, else notifications), plus a dot on their workspace (no tray), launcher (Super+Space all, Super+D apps, Super+P projects from fzf-marks, Super+Ctrl+P actions; also windows, calculator, web), app glyphs instead of an icon theme | all |
 | kitty | kitty (config to port) | all |
+| claude | Claude desktop app (AUR repack of the official .deb; opens on the AI workspace, dark by its own flag), Claude Code CLI (native installer, updates itself), `~/.claude/settings.json` in the repo | home, work, vm |
 | chrome | Google Chrome, opens on the Browser workspace | vm |
 | telegram / slack | Telegram, Slack: start with the session on the Chat workspace | vm |
 | bluetooth | bluez, blueman | home |

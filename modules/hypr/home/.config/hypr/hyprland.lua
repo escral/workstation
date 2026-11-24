@@ -108,8 +108,10 @@ place("telegram", "^org\\.telegram\\.desktop$", "10 silent")
 place("slack", "(?i)^slack$", "10 silent")
 place("discord", "(?i)^(discord|vesktop)$", "10 silent")
 
--- Modules drop bindings into binds.d/ and app autostart into apps.d/;
--- profiles drop overrides into local/.
+-- Modules drop hotkeys and launcher actions into actions.d/ (catalog.lua)
+-- and app autostart into apps.d/; profiles drop overrides into local/.
+dofile(os.getenv("HOME") .. "/.config/hypr/catalog.lua")
+
 local function load_dir(name)
     local dir = os.getenv("HOME") .. "/.config/hypr/" .. name
     local ls = io.popen('ls "' .. dir .. '"/*.lua 2>/dev/null')
@@ -118,6 +120,7 @@ local function load_dir(name)
     ls:close()
 end
 
-load_dir("binds.d")
+load_dir("actions.d")
 load_dir("apps.d")
 load_dir("local")
+catalog_export()

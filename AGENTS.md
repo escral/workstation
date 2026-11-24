@@ -40,8 +40,11 @@ vm/              QEMU test harness
   `~/.config/hypr/local/*.lua`.
 - **Hyprland config is Lua** (0.57+): `hyprland.lua`, API under `hl.*`.
   `hyprland.conf` is ignored.
-- **Bindings live with their module**: `home/.config/hypr/binds.d/<topic>.lua`.
-  One explicit `hl.bind` line per binding; loops only for workspace numbers.
+- **Hotkeys and launcher actions live with their module** in
+  `home/.config/hypr/actions.d/<topic>.lua`: `bind {}` for a hotkey (listed
+  in the help), `action {}` for something to run from the launcher (fields in
+  `modules/hypr/home/.config/hypr/catalog.lua`). Raw `hl.bind` only for loops
+  and inside submaps, with a `bind {}` without `run` documenting them.
 - **Environment goes in `home/.config/env.d/NN-name.sh`** (POSIX sh, `ws_path`
   for PATH). Shells and the desktop session (IDEs) both load it.
 - **No secrets in git.** The repo is public. Secrets come from Bitwarden

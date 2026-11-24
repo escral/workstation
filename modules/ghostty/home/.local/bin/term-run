@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Runs a command in a new Ghostty window that stays open to read the output.
+# Through the background instance, like ghostty-here; its own
+# --wait-after-command is lost on the way, so the shell waits instead.
+#   term-run 'marks-sync /var/www'
+set -euo pipefail
+
+cmd=${1:?usage: term-run COMMAND}
+script="$cmd; printf '\\n[Enter closes]'; read -r _"
+script=${script//\\/\\\\}
+script=${script//\'/\\\'}  # GVariant string literal
+
+exec gdbus call --session --dest com.mitchellh.ghostty \
+  --object-path /com/mitchellh/ghostty \
+  --method org.gtk.Actions.Activate new-window-command \
+  "[<['-e', 'sh', '-c', '$script']>]" '{}' >/dev/null

@@ -23,8 +23,10 @@ Personal Arch + Hyprland + Quickshell layer. One command on bare Arch
 boot.sh          entry on bare Arch
 bin/ws           CLI
 lib/             shared bash (common.sh: log/warn/die/have/read_list)
-modules/<name>/  packages, aur, home/ (stowed into $HOME), setup.sh,
-                 state + state-exclude (app state for ws backup)
+themes/<name>    colour tokens: `name #hex`, or `role name` (accent blue)
+modules/<name>/  packages, aur, home/ (stowed into $HOME), theme/ (rendered
+                 into $HOME), setup.sh, state + state-exclude (app state for
+                 ws backup)
 profiles/<name>/ profile.sh (extends, modules+=, flags), home/ overlay
 vm/              QEMU test harness
 ```
@@ -46,6 +48,10 @@ vm/              QEMU test harness
   `modules/hypr/home/.config/hypr/catalog.lua`). Raw `hl.bind` only for loops,
   submaps and press/release pairs, with a `bind {}` without `run`
   documenting them.
+- **Colours come from the theme.** No hex in `home/`: a file with colours
+  goes in the module's `theme/` (same paths as `home/`) with `{{token}}` for
+  each, e.g. `"#{{bg}}"`, `rgba({{accent}}ff)`. `ws sync` renders them. Brand
+  colours (`Glyphs.qml`) aren't theme. An unknown token stops the render.
 - **Environment goes in `home/.config/env.d/NN-name.sh`** (POSIX sh, `ws_path`
   for PATH). Shells and the desktop session (IDEs) both load it.
 - **No secrets in git.** The repo is public. Secrets come from Bitwarden

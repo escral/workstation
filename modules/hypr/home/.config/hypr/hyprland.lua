@@ -6,10 +6,6 @@ hl.config({
         gaps_out = 8,
         border_size = 2,
         layout = "dwindle",
-        col = {
-            active_border = { colors = { "rgba(7aa2f7ff)", "rgba(bb9af7ff)" }, angle = 45 },
-            inactive_border = "rgba(292e42ff)",
-        },
     },
     decoration = {
         rounding = 10,
@@ -26,21 +22,11 @@ hl.config({
         repeat_delay = 400,
     },
     group = {
-        col = {
-            border_active = { colors = { "rgba(7aa2f7ff)", "rgba(bb9af7ff)" }, angle = 45 },
-            border_inactive = "rgba(292e42ff)",
-        },
         groupbar = {
             font_family = "FiraCode Nerd Font",
             font_size = 10,
             height = 18,
             gradients = true,
-            col = {
-                active = "rgba(7aa2f7ff)",
-                inactive = "rgba(292e42ff)",
-            },
-            text_color = "rgba(1a1b26ff)",
-            text_color_inactive = "rgba(a9b1d6ff)",
         },
     },
     binds = {
@@ -107,6 +93,9 @@ place("firefox", "^firefox$", "9")
 place("telegram", "^org\\.telegram\\.desktop$", "10 silent")
 place("slack", "(?i)^slack$", "10 silent")
 place("discord", "(?i)^(discord|vesktop)$", "10 silent")
+
+-- Colours come from the theme (ws theme), written out next to this file.
+dofile(os.getenv("HOME") .. "/.config/hypr/theme.lua")
 
 -- Modules drop hotkeys and launcher actions into actions.d/ (catalog.lua)
 -- and app autostart into apps.d/; profiles drop overrides into local/.

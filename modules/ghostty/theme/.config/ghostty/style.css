@@ -1,9 +1,9 @@
 /* Ghostty draws its window chrome with GTK, so its toasts only take styling
    through GTK CSS. */
 toast {
-  background-color: rgba(26, 27, 38, 0.94);
-  color: #c0caf5;
-  border: 1px solid #292e42;
+  background-color: alpha(#{{bg}}, 0.94);
+  color: #{{text}};
+  border: 1px solid #{{highlight}};
   border-radius: 10px;
   font-family: "FiraCode Nerd Font";
   font-size: 10pt;

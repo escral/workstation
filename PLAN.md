@@ -24,7 +24,7 @@ workstation. Not a distro — a layer on top of Arch.
 | Runtimes | fnm (Node), official installer (Bun), pacman (PHP) | Each tool's native way |
 | Secrets | Bitwarden (`rbw`): `ws secrets` after install writes the vault folder `workstation` into ~ | Repo stays public, nothing encrypted in git |
 | App state | `ws backup` / `ws restore` to a USB drive (found and mounted by itself, or a folder given): restic repository `ws-backup`, encrypted with a password asked each run and kept nowhere. One snapshot per module, paths in its `state` file, caches in `state-exclude`. Running apps are offered to close | Config in git, state on the drive. Never in git. Chromium apps encrypt cookies and passwords with a key from the keyring, so the keyring goes too; it opens only under the same login password |
-| Theme | One token file → generated configs for every app | Theme switch = one change |
+| Theme | `themes/<name>`: named colours plus roles (`accent blue`). Modules keep their colour files in `theme/` as templates with `{{token}}`; `ws install`/`sync` render them into ~ as real files, `ws theme NAME` switches and reloads Hyprland, Quickshell and Ghostty | One place for the colours; a theme from elsewhere is copied into a new file. Zed, the IDEs and Claude keep a built-in theme by name |
 | Bindings | Action catalog: `bind {}` / `action {}` in each module's `hypr/actions.d/*.lua`. Hyprland binds the keys and writes `~/.cache/ws/actions.json` for the launcher and the help; they run an entry via `hyprctl dispatch 'ws_action(...)'` | One source of truth, no generator step; Lua actions run too |
 | Profiles | `profiles/<name>/` = modules + flags + overlay files (monitors, autostart, peripherals) | Whole-machine setup, not only hardware |
 | Testing | QEMU VM with virgl. `ws vm base` builds a minimal btrfs Arch image unattended (cloud-init seed over HTTP → ssh into live ISO → `vm/install-base.sh`); `ws vm fresh` = clean overlay + full bootstrap | See a reinstall without reinstalling; catch drift. Host needs only QEMU + python3; TCG fallback without KVM (headless only) |
@@ -36,10 +36,12 @@ workstation. Not a distro — a layer on top of Arch.
 boot.sh                 curl | bash entry on bare Arch
 bin/ws                  CLI (install, sync, update, drift, vm, ...)
 lib/                    shared bash helpers
+themes/<name>           colour tokens, one per line
 modules/<name>/
   packages              pacman packages, one per line, # comments ok
   aur                   AUR packages
   home/                 stow package, mirrors $HOME
+  theme/                colour files as {{token}} templates, mirrors $HOME, rendered
   setup.sh              optional idempotent hook (runs after packages + stow)
   state                 app state paths under ~ for `ws backup`; caches in state-exclude
 profiles/<name>/
@@ -139,7 +141,7 @@ action { title = "Sync project marks", run = "marks-sync /var/www", terminal = t
 3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, terminal → Ghostty ✓, git ✓, scripts ✓ (`marks-sync`, `vpn`; the rest replaced or dropped); nvim left
 4. [x] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓, launcher ✓, app glyphs ✓, calendar popup ✓, "no results" line in the launcher ✓, attention indicator in place of a tray (LauncherEntry unread counts, our notifications, urgent windows, SNI NeedsAttention) ✓
 5. [x] Action catalog, designed together with 6: `bind {}` / `action {}` in `actions.d/` ✓, launcher's Actions from it ✓, existing hotkeys moved over ✓, help overlay on Super+/ ✓; later: providers
-6. [ ] Theme tokens + generators: mainly one place for the colours every app uses; switching themes (an action) is a nice extra
+6. [x] Theme tokens: `themes/tokyo-night` ✓, `theme/` templates for Quickshell, Hyprland, Ghostty, starship, btop ✓, `ws theme NAME` with live reload ✓; later: a launcher action per theme (provider)
 7. [x] Secrets from Bitwarden (`ws secrets`: SSH keys, ssh hosts, git identity) ✓; app state backup/restore to a USB drive (`ws backup` / `ws restore`) ✓
 8. [ ] AI module (embeddings search, first in the launcher; whisper dictation, piper)
 9. [ ] Install on home PC (wipe Linux partition, keep Windows). Windows keeps the hardware clock in local time and Linux in UTC: set Windows to UTC (`RealTimeIsUniversal`) or the clock jumps by 2h between them. Moving from the current Ubuntu: its `~/.local/share/keyrings` opens here if the login password is the same; else move the `<App> Safe Storage` keys by hand (`secret-tool`)

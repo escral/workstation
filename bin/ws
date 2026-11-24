@@ -12,16 +12,19 @@ source "$WS_ROOT/lib/packages.sh"
 source "$WS_ROOT/lib/secrets.sh"
 # shellcheck source=../lib/backup.sh
 source "$WS_ROOT/lib/backup.sh"
+# shellcheck source=../lib/theme.sh
+source "$WS_ROOT/lib/theme.sh"
 
 usage() {
   cat <<USAGE
 usage: ws <command> [args]
 
   install [--profile NAME]   packages + dotfiles + module hooks (idempotent)
-  sync                       restow dotfiles only (fast, after editing the repo)
+  sync                       restow dotfiles and theme only (fast, after editing the repo)
   update                     git pull, system upgrade, then install
   drift                      packages installed but not declared, and vice versa
   profile [NAME]             show current profile, or switch to NAME
+  theme [NAME]               show current theme, or switch to NAME
   secrets [--force]          pull files into ~ from the Bitwarden folder "workstation"
   backup [MODULE...] [DIR]   save app state to a USB drive (or DIR), asks a password
   restore [MODULE...] [DIR]  bring app state back from it
@@ -41,14 +44,28 @@ save_profile() {
   printf '%s\n' "$1" >"$WS_CONFIG/profile"
 }
 
+profile_dirs() {
+  local m p
+  for m in "${modules[@]}"; do printf '%s\n' "$WS_ROOT/modules/$m"; done
+  for p in "${WS_PROFILE_CHAIN[@]}"; do printf '%s\n' "$WS_ROOT/profiles/$p"; done
+}
+
 do_stow() {
-  local m p d dirs=()
-  for m in "${modules[@]}"; do dirs+=("$WS_ROOT/modules/$m"); done
-  for p in "${WS_PROFILE_CHAIN[@]}"; do dirs+=("$WS_ROOT/profiles/$p"); done
+  local d dirs
+  mapfile -t dirs < <(profile_dirs)
   unstow_removed "${dirs[@]}"
   for d in "${dirs[@]}"; do stow_home "$d"; done
   record_stowed "${dirs[@]}"
   prune_dead_links
+}
+
+# Runs before stow: when a file moves from home/ to theme/, its old link is
+# then replaced in one step. do_stow would remove it first, and Quickshell,
+# reloading in that gap, never notices the new file.
+do_theme() {
+  local dirs
+  mapfile -t dirs < <(profile_dirs)
+  render_theme "${dirs[@]}"
 }
 
 run_hooks() {
@@ -76,6 +93,8 @@ cmd_install() {
   log "profile: ${WS_PROFILE_CHAIN[*]}"
   log "modules: ${modules[*]}"
   install_packages "${modules[@]}"
+  log "theme: $(current_theme)"
+  do_theme
   log "stowing dotfiles"
   do_stow
   run_hooks
@@ -84,6 +103,7 @@ cmd_install() {
 
 cmd_sync() {
   load_profile "$(resolve_profile)"
+  do_theme
   do_stow
 }
 
@@ -136,6 +156,21 @@ cmd_profile() {
   echo "available: $(list_profiles | paste -sd' ')"
 }
 
+cmd_theme() {
+  if (($#)); then
+    load_theme "$1"   # validate before saving
+    mkdir -p "$WS_CONFIG"
+    printf '%s\n' "$1" >"$WS_CONFIG/theme"
+    load_profile "$(resolve_profile)"
+    do_theme
+    reload_theme
+    log "theme set to $1; the login screen follows on the next 'ws install'"
+    return
+  fi
+  echo "theme: $(current_theme)"
+  echo "available: $(list_themes | paste -sd' ')"
+}
+
 main() {
   local cmd=${1:-help}
   shift || true
@@ -145,6 +180,7 @@ main() {
     update)  cmd_update "$@" ;;
     drift)   cmd_drift "$@" ;;
     profile) cmd_profile "$@" ;;
+    theme)   cmd_theme "$@" ;;
     secrets) cmd_secrets "$@" ;;
     backup)  cmd_backup "$@" ;;
     restore) cmd_restore "$@" ;;

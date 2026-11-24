@@ -3,19 +3,19 @@ add_newline = false
 format = "$directory$git_branch$git_status$cmd_duration$character"
 
 [directory]
-style = "bold #7aa2f7"
+style = "bold #{{blue}}"
 truncation_length = 3
 truncate_to_repo = false
 format = "[$path]($style)"
 
 [git_branch]
-style = "bold #bb9af7"
+style = "bold #{{magenta}}"
 format = " [$branch]($style)"
 
 # One "*" for any uncommitted change. Symbols are zero-width so the group
 # shows only when something is dirty, without listing what.
 [git_status]
-style = "bold #bb9af7"
+style = "bold #{{magenta}}"
 format = "([*$all_status]($style))"
 conflicted = "​"
 deleted = "​"
@@ -31,9 +31,9 @@ diverged = ""
 
 [cmd_duration]
 min_time = 3_000
-style = "#565f89"
+style = "#{{muted}}"
 format = " [took $duration]($style)"
 
 [character]
-success_symbol = " [❯](bold #9ece6a)"
-error_symbol = " [❯](bold #f7768e)"
+success_symbol = " [❯](bold #{{green}})"
+error_symbol = " [❯](bold #{{red}})"

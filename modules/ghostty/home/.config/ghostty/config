@@ -1,4 +1,4 @@
-theme = TokyoNight Night
+theme = workstation
 # A new window's first frame is drawn by GTK before the terminal is ready.
 # Opaque and in the terminal's colors, it matches what follows; translucent,
 # it flashes the wallpaper. Inactive windows still get glass from Hyprland.

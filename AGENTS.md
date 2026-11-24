@@ -23,7 +23,8 @@ Personal Arch + Hyprland + Quickshell layer. One command on bare Arch
 boot.sh          entry on bare Arch
 bin/ws           CLI
 lib/             shared bash (common.sh: log/warn/die/have/read_list)
-modules/<name>/  packages, aur, home/ (stowed into $HOME), setup.sh
+modules/<name>/  packages, aur, home/ (stowed into $HOME), setup.sh,
+                 state + state-exclude (app state for ws backup)
 profiles/<name>/ profile.sh (extends, modules+=, flags), home/ overlay
 vm/              QEMU test harness
 ```

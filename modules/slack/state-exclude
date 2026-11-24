@@ -1,0 +1,13 @@
+Cache
+Code Cache
+GPUCache
+DawnGraphiteCache
+DawnWebGPUCache
+CacheStorage
+ScriptCache
+logs
+Crashpad
+sentry
+Dictionaries
+GPUPersistentCache
+Shared Dictionary

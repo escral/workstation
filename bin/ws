@@ -10,6 +10,8 @@ source "$WS_ROOT/lib/stow.sh"
 source "$WS_ROOT/lib/packages.sh"
 # shellcheck source=../lib/secrets.sh
 source "$WS_ROOT/lib/secrets.sh"
+# shellcheck source=../lib/backup.sh
+source "$WS_ROOT/lib/backup.sh"
 
 usage() {
   cat <<USAGE
@@ -21,6 +23,8 @@ usage: ws <command> [args]
   drift                      packages installed but not declared, and vice versa
   profile [NAME]             show current profile, or switch to NAME
   secrets [--force]          pull files into ~ from the Bitwarden folder "workstation"
+  backup [MODULE...] [DIR]   save app state to a USB drive (or DIR), asks a password
+  restore [MODULE...] [DIR]  bring app state back from it
   vm <sub>                   VM harness (ws vm help)
   help                       this text
 USAGE
@@ -142,6 +146,8 @@ main() {
     drift)   cmd_drift "$@" ;;
     profile) cmd_profile "$@" ;;
     secrets) cmd_secrets "$@" ;;
+    backup)  cmd_backup "$@" ;;
+    restore) cmd_restore "$@" ;;
     vm)      exec bash "$WS_ROOT/vm/vm.sh" "$@" ;;
     help|-h|--help) usage ;;
     *) usage; exit 1 ;;

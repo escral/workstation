@@ -1,0 +1,21 @@
+Cache
+Code Cache
+GPUCache
+GrShaderCache
+GraphiteDawnCache
+ShaderCache
+CacheStorage
+ScriptCache
+Shared Dictionary
+GPUPersistentCache
+optimization_guide_model_store
+component_crx_cache
+extensions_crx_cache
+Crash Reports
+Dictionaries
+WidevineCdm
+DawnWebGPUCache
+DawnGraphiteCache
+screen_ai
+WasmTtsEngine
+OnDeviceHeadSuggestModel

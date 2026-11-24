@@ -3,14 +3,9 @@ theme = TokyoNight Night
 # Opaque and in the terminal's colors, it matches what follows; translucent,
 # it flashes the wallpaper. Inactive windows still get glass from Hyprland.
 window-theme = ghostty
-# Shell integration turns the cursor into a bar at the prompt; starting as a
-# block would flash one first.
-cursor-style = bar
-custom-shader = shaders/hide-unfocused-cursor.glsl
-# The shader is static; animating would redraw every frame for nothing.
-custom-shader-animation = false
+cursor-style = block
 font-family = FiraCode Nerd Font
-font-size = 11
+font-size = 12
 window-padding-x = 8
 window-padding-y = 8
 window-decoration = false
@@ -21,7 +16,8 @@ resize-overlay = never
 gtk-single-instance = true
 quit-after-last-window-closed = false
 
-shell-integration-features = ssh-env,ssh-terminfo
+# no-cursor: shell integration would turn the block into a bar at the prompt.
+shell-integration-features = no-cursor,ssh-env,ssh-terminfo
 gtk-custom-css = style.css
 
 # New window in the same directory; Hyprland tiles it like a split.

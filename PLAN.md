@@ -72,11 +72,12 @@ AI_TIER=gpu
 |---|---|---|
 | base | git, stow, curl, base-devel, pacman tweaks, `ws` on PATH | all |
 | network | NetworkManager, nm-connection-editor | all |
+| vpn | L2TP/IPsec plugin (networkmanager-l2tp, strongswan); `vpn NAME` toggles a saved connection, `vpn --status NAME` | all |
 | audio | pipewire, wireplumber, pavucontrol | all |
 | secrets | rbw; `ws secrets` writes the Bitwarden folder `workstation` into ~, each item named by its path: SSH key items give the key and `.pub` (`.ssh/id_rsa`), notes their text (`.ssh/config.local`, `.config/git/identity`) | all |
 | ssh | openssh, ssh-agent (systemd user socket, keys added on first use), `~/.ssh/config` including `config.local` (hosts, from Bitwarden) | all |
 | git | `~/.config/git/config` (Bitbucket over ssh); name and email in `identity`, from Bitwarden | all |
-| cli | fzf, fzf-marks, ripgrep, fd, jq, unzip, man-db, btop, `ide` (opens a project in PhpStorm/WebStorm) | all |
+| cli | fzf, fzf-marks, ripgrep, fd, jq, unzip, man-db, btop, `ide` (opens a project in PhpStorm/WebStorm), `marks-sync DIR[:PREFIX]...` (bookmarks the folders inside each DIR) | all |
 | firewall | ufw | all |
 | maintenance | pacman-contrib, paccache.timer | all |
 | time | `TIMEZONE` from the profile, NTP via systemd-timesyncd | all |
@@ -84,7 +85,7 @@ AI_TIER=gpu
 | keyring | gnome-keyring, unlocked at login by PAM (greetd); holds the Chrome/Slack/Claude storage keys. After `ws restore keyring`, sign out and back in so the daemon reads it | all |
 | login | greetd + cage running the Quickshell login screen → uwsm Hyprland | all |
 | fonts | FiraCode Nerd, Noto, emoji | all |
-| zsh | zsh + plugins, chsh (config to port) | all |
+| zsh | zsh, oh-my-zsh without plugins, autosuggestions, starship; chsh | all |
 | hypr | Hyprland, portals, polkit agent, screenshots, xdg-user-dirs | all |
 | quickshell | Bar, shader background, lock screen + idle lock/DPMS, notification popups, volume OSD, mute/offline/load indicators, calendar popup (click the date), red attention pills for apps with unread (LauncherEntry counts, else notifications), plus a dot on their workspace (no tray), launcher (Super+Space all, Super+D apps, Super+P projects from fzf-marks, Super+Ctrl+P actions; also windows, calculator, web), app glyphs instead of an icon theme | all |
 | kitty | kitty (config to port) | all |
@@ -125,7 +126,7 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 1. [x] Skeleton, `ws` CLI, bootstrap, starter modules/profiles
 2. [x] VM: `ws vm base` + `ws vm fresh` green, Hyprland (Lua config) + Quickshell bar running
 2b. [x] Time: NTP sync (systemd-timesyncd) and timezone per profile
-3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, kitty → ghostty ✓; nvim, git, scripts left
+3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, kitty → ghostty ✓, git ✓, scripts ✓ (`marks-sync`, `vpn`; the rest replaced or dropped); nvim left
 4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓, launcher ✓, app glyphs ✓, calendar popup ✓, attention indicator in place of a tray (LauncherEntry unread counts, our notifications, urgent windows, SNI NeedsAttention) ✓; left: a timers module (pomodoro, reminders via systemd timers)
 5. [ ] Theme tokens + generators
 6. [ ] Action catalog generator + help overlay; the catalog feeds the launcher's Actions

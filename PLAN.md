@@ -95,7 +95,10 @@ AI_TIER=gpu
 | telegram / slack | Telegram, Slack: start with the session on the Chat workspace | vm |
 | bluetooth | bluez, blueman | home |
 | nvidia | nvidia-open + Wayland bits | home |
+| intel / virtio | The GPU's Vulkan driver (vulkan-intel; vulkan-swrast in the VM, where virgl is GL only), so Vulkan apps don't pull nvidia-utils | work / vm |
 | dev-node / dev-bun / dev-php | fnm / bun / php+composer | home, work |
+| jetbrains | Toolbox from JetBrains' latest release (updates itself and the IDEs); PhpStorm/WebStorm installed from it; its scripts on PATH for `ide`; kept out of XDG autostart (no tray here) | home, work, vm |
+| zed | Zed as the quick plain editor: Tokyo Night, FiraCode 18, line height 1.4; minimal chrome, no AI, no language servers, telemetry off | home, work, vm |
 
 ## Action catalog (planned)
 
@@ -127,7 +130,7 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 2. [x] VM: `ws vm base` + `ws vm fresh` green, Hyprland (Lua config) + Quickshell bar running
 2b. [x] Time: NTP sync (systemd-timesyncd) and timezone per profile
 3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, kitty → ghostty ✓, git ✓, scripts ✓ (`marks-sync`, `vpn`; the rest replaced or dropped); nvim left
-4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓, launcher ✓, app glyphs ✓, calendar popup ✓, attention indicator in place of a tray (LauncherEntry unread counts, our notifications, urgent windows, SNI NeedsAttention) ✓; left: a timers module (pomodoro, reminders via systemd timers)
+4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓, launcher ✓, app glyphs ✓, calendar popup ✓, "no results" line in the launcher ✓, attention indicator in place of a tray (LauncherEntry unread counts, our notifications, urgent windows, SNI NeedsAttention) ✓; left: a timers module (pomodoro, reminders via systemd timers)
 5. [ ] Theme tokens + generators
 6. [ ] Action catalog generator + help overlay; the catalog feeds the launcher's Actions
 7. [x] Secrets from Bitwarden (`ws secrets`: SSH keys, ssh hosts, git identity) ✓; app state backup/restore to a USB drive (`ws backup` / `ws restore`) ✓

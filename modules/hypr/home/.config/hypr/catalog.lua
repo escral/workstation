@@ -21,7 +21,8 @@ local function warn(text)
     hl.notification.create({ text = "actions: " .. text, duration = 10000 })
 end
 
-local function quote(s)
+-- Global, for actions.d files that build commands too.
+function shell_quote(s)
     return "'" .. s:gsub("'", "'\\''") .. "'"
 end
 
@@ -29,7 +30,7 @@ local function dispatcher(e)
     if type(e.run) ~= "string" then
         return e.run
     end
-    return hl.dsp.exec_cmd(e.terminal and "term-run " .. quote(e.run) or e.run)
+    return hl.dsp.exec_cmd(e.terminal and "term-run " .. shell_quote(e.run) or e.run)
 end
 
 local function add(e, kind)

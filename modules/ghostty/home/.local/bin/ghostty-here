@@ -1,23 +1,62 @@
 #!/usr/bin/env bash
 # New Ghostty window via the background instance (D-Bus, ~130ms; the CLI
-# boots GTK just to hand off, and drops --working-directory on the way). With
-# a directory, opens there; with a pid, where that app is working: the cwd of
-# its deepest interactive child (shell, nvim, ...).
+# boots GTK just to hand off, and drops --working-directory on the way).
+#   ghostty-here DIR                  opens there
+#   ghostty-here PID [CLASS TITLE]    where that app is working: an IDE's
+#                                     project root, else the cwd of its
+#                                     deepest interactive child (shell, nvim)
 set -euo pipefail
+
+# JetBrains IDEs and Zed name the project in the window title, before " – "
+# or " — "; their own records hold the path behind that name.
+project_dir() {
+  local class=$1 title=$2 name
+  name=${title%% – *}
+  name=${name%% — *}
+  case $class in
+    jetbrains-*)
+      # Each project is an <entry key="path"> with the frame title it last had.
+      awk -v name="$name" '
+        match($0, /<entry key="[^"]+"/) { key = substr($0, RSTART + 12, RLENGTH - 13) }
+        match($0, /frameTitle="[^"]*"/) {
+          title = substr($0, RSTART + 12, RLENGTH - 13)
+          base = key; sub(/.*\//, "", base)
+          if (base == name || index(title, name " – ") == 1) { print key; exit }
+        }' "$HOME"/.config/JetBrains/*/options/recentProjects.xml 2>/dev/null \
+        | sed "s|^\\\$USER_HOME\\\$|$HOME|"
+      ;;
+    dev.zed.zed)
+      sqlite3 "$HOME/.local/share/zed/db/0-stable/db.sqlite" \
+        "select paths from workspaces order by timestamp desc" 2>/dev/null \
+        | while IFS= read -r path; do
+            [[ ${path##*/} == "$name" ]] || continue
+            [[ -f $path ]] && path=${path%/*}
+            echo "$path"
+            break
+          done
+      ;;
+  esac
+}
 
 dir=$HOME
 if [[ -d ${1:-} ]]; then
   dir=$1
 elif [[ -n ${1:-} ]]; then
-  pid=$1
-  # Follow the newest child that has a terminal: skips background helpers,
-  # which share the parent but aren't where you work.
-  while child=$(ps -o pid=,tty= --ppid "$pid" --sort=-start_time | awk '$2 != "?" {print $1; exit}') \
-        && [[ -n $child ]]; do
-    pid=$child
-  done
-  cwd=$(readlink "/proc/$pid/cwd" || true)
-  [[ -n $cwd && $cwd != / ]] && dir=$cwd
+  pid=$1 class=${2:-}
+  # A lookup that finds nothing, or stops at its first match, is no error.
+  project=$(project_dir "${class,,}" "${3:-}" | head -1 || true)
+  if [[ -d $project ]]; then
+    dir=$project
+  else
+    # Follow the newest child that has a terminal: skips background helpers,
+    # which share the parent but aren't where you work.
+    while child=$(ps -o pid=,tty= --ppid "$pid" --sort=-start_time | awk '$2 != "?" {print $1; exit}') \
+          && [[ -n $child ]]; do
+      pid=$child
+    done
+    cwd=$(readlink "/proc/$pid/cwd" || true)
+    [[ -n $cwd && $cwd != / ]] && dir=$cwd
+  fi
 fi
 
 dir=${dir//\'/\\\'}  # GVariant string literal

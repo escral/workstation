@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Toggles a saved NetworkManager connection, a VPN or any other.
+#   vpn NAME            up if it is down, down if it is up
+#   vpn --status NAME   prints up or down; exit status 1 when down
+set -euo pipefail
+
+status=0
+if [[ ${1:-} == --status ]]; then
+  status=1
+  shift
+fi
+name="$*"
+if [[ -z $name ]]; then
+  echo "usage: vpn [--status] <connection>" >&2
+  exit 1
+fi
+if ! nmcli -g NAME connection show | grep -Fqx "$name"; then
+  echo "vpn: no such connection: $name" >&2
+  echo "saved: $(nmcli -g NAME connection show | paste -sd, | sed 's/,/, /g')" >&2
+  exit 1
+fi
+
+active=0
+nmcli -g NAME connection show --active | grep -Fqx "$name" && active=1
+
+if ((status)); then
+  ((active)) && echo "$name: up" || { echo "$name: down"; exit 1; }
+  exit 0
+fi
+if ((active)); then
+  exec nmcli connection down id "$name"
+fi
+exec nmcli connection up id "$name"

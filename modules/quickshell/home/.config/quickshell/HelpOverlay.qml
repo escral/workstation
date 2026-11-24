@@ -4,29 +4,28 @@ import Quickshell.Io
 import Quickshell.Wayland
 import QtQuick
 
-// The hotkeys from the action catalog (hypr/catalog.lua), grouped, while
-// Super is held. Hyprland shows and hides it (quickshell/actions.d/help.lua);
-// it never takes the keyboard, so the held Super still reaches Hyprland.
+// The hotkeys from the action catalog (hypr/catalog.lua), grouped. Hyprland
+// opens and closes it and reports the held modifiers through a state file
+// (quickshell/actions.d/help.lua); it never takes the keyboard, so every key
+// still reaches Hyprland and the apps.
 Scope {
     id: root
 
-    property bool open: false
-    readonly property var entries: Catalog.entries.filter(e => e.help && e.keys.length)
-    // Modifiers held besides Super, e.g. ["SHIFT"].
-    property var mods: []
+    // "open SUPER,SHIFT" while up with those held, "closed" otherwise.
+    property string state: "closed"
+    readonly property bool open: state.startsWith("open")
+    readonly property var mods: open ? state.slice(5).split(",").filter(m => m) : []
 
-    IpcHandler {
-        target: "help"
-        // mods: the other held modifiers, comma separated, or "none".
-        function hold(mods: string): void {
-            root.mods = mods === "none" ? [] : mods.split(",");
-            root.open = true;
-        }
-        function release(): void {
-            root.open = false;
-            root.mods = [];
-        }
+    FileView {
+        path: (Quickshell.env("XDG_RUNTIME_DIR") || "/tmp") + "/ws-help"
+        watchChanges: true
+        printErrors: false
+        onFileChanged: reload()
+        onLoaded: root.state = text().trim()
+        onLoadFailed: root.state = "closed"
     }
+
+    readonly property var entries: Catalog.entries.filter(e => e.help && e.keys.length)
 
     // An app's own keys only while that app is focused.
     readonly property string focusedApp: (ToplevelManager.activeToplevel?.appId ?? "").toLowerCase()
@@ -75,16 +74,16 @@ Scope {
         return combo.split(/\s*\+\s*/).map(p => capNames[p.toUpperCase()] ?? (p.length === 1 ? p.toUpperCase() : p));
     }
 
-    // Reachable when one of its combos holds Super and every held modifier:
-    // its held caps are marked and the rest show what is left to press. Rows
-    // that can't be reached dim whole rather than hide, so nothing moves while
+    // Reachable when one of its combos holds every held modifier: its held
+    // caps are marked and the rest show what is left to press. Rows that
+    // can't be reached dim whole rather than hide, so nothing moves while
     // modifiers come and go.
-    readonly property var heldCaps: ["Super", ...mods.map(m => capNames[m])]
+    readonly property var heldCaps: mods.map(m => capNames[m])
 
     function reachable(keys) {
         return keys.some(k => {
             const parts = k.toUpperCase().split(/\s*\+\s*/);
-            return parts.includes("SUPER") && mods.every(m => parts.includes(m));
+            return mods.every(m => parts.includes(m));
         });
     }
 

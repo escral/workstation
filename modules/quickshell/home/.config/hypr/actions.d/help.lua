@@ -1,36 +1,34 @@
--- The help shows once Super is held past the key repeat delay (a long_press
--- bind, so quick combos never show it), and lights up what the other held
--- modifiers reach. They are tracked here and reach Quickshell only while the
--- help is up: Shift goes up and down all through typing.
+-- Super+? opens the help and Esc (or Super+? again) closes it. While it is
+-- up, the held modifiers mark what they reach. The state goes to a file the
+-- help watches: writes keep their order, where separate ipc calls could
+-- arrive out of turn and leave it on screen.
 --
 -- ignore_mods: a modifier's own press and release come with other modifiers
 -- already in the mask. transparent: a plain release bind does not fire after
--- a combo like Super+H, which would leave the help on screen.
+-- a combo like Super+H.
 
+local state = (os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/ws-help"
 local held = { SUPER = false, SHIFT = false, CTRL = false, ALT = false }
 local open = false
 
-local function send(call)
-    hl.exec_cmd("quickshell ipc call help " .. call)
-end
-
-local function update()
-    if not open then
-        return
-    end
+local function write()
     local mods = {}
-    for _, m in ipairs({ "SHIFT", "CTRL", "ALT" }) do
+    for _, m in ipairs({ "SUPER", "SHIFT", "CTRL", "ALT" }) do
         if held[m] then
             mods[#mods + 1] = m
         end
     end
-    send("hold " .. (#mods > 0 and table.concat(mods, ",") or "none"))
+    local f = io.open(state, "w")
+    if f then
+        f:write(open and "open " .. table.concat(mods, ",") or "closed")
+        f:close()
+    end
 end
 
-local function long_press()
-    if held.SUPER then
-        open = true
-        update()
+-- Shift goes up and down all through typing; only an open help cares.
+local function update()
+    if open then
+        write()
     end
 end
 
@@ -49,22 +47,30 @@ for key, mod in pairs(keys) do
         update()
     end, { non_consuming = true, transparent = true, ignore_mods = true })
 
-    hl.bind(key, long_press, { long_press = true, non_consuming = true, ignore_mods = true })
-
     hl.bind(key, function()
         held[mod] = false
-        if mod ~= "SUPER" then
-            return update()
-        end
-        if open then
-            send("release")
-        end
-        open = false
+        update()
     end, { release = true, non_consuming = true, transparent = true, ignore_mods = true })
 end
 
+-- By keycode: with Shift held the key's symbol is "question", which a bind
+-- by name does not match.
+hl.bind("SUPER + SHIFT + code:61", function()
+    open = not open
+    write()
+end)
+
+hl.bind("Escape", function()
+    if open then
+        open = false
+        write()
+    end
+end, { non_consuming = true })
+
+write()
+
 bind {
-    title = "This help: hold Super",
+    title = "This help, Esc closes",
     group = "Launcher",
-    keys = "SUPER",
+    keys = "SUPER + ?",
 }

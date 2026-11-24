@@ -54,7 +54,7 @@ local function add(e, kind)
             warn(k .. " is bound twice: " .. by_keys[norm] .. ", " .. e.title)
         end
         by_keys[norm] = e.title
-        hl.bind(k, dispatcher(e), { locked = e.locked, repeating = e.repeating, mouse = e.mouse })
+        hl.bind(k, dispatcher(e), { desc = e.title, locked = e.locked, repeating = e.repeating, mouse = e.mouse })
     end
 end
 

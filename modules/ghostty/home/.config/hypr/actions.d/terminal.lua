@@ -15,3 +15,24 @@ bind {
     keys = "SUPER + Return",
     run = terminal_here,
 }
+
+bind {
+    title = "New window here",
+    group = "Ghostty",
+    app = "com.mitchellh.ghostty",
+    keys = "CTRL + SHIFT + Return",
+}
+
+bind {
+    title = "Copy, or interrupt with no selection",
+    group = "Ghostty",
+    app = "com.mitchellh.ghostty",
+    keys = "CTRL + C",
+}
+
+bind {
+    title = "Interrupt",
+    group = "Ghostty",
+    app = "com.mitchellh.ghostty",
+    keys = "CTRL + SHIFT + C",
+}

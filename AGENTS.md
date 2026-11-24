@@ -43,8 +43,9 @@ vm/              QEMU test harness
 - **Hotkeys and launcher actions live with their module** in
   `home/.config/hypr/actions.d/<topic>.lua`: `bind {}` for a hotkey (listed
   in the help), `action {}` for something to run from the launcher (fields in
-  `modules/hypr/home/.config/hypr/catalog.lua`). Raw `hl.bind` only for loops
-  and inside submaps, with a `bind {}` without `run` documenting them.
+  `modules/hypr/home/.config/hypr/catalog.lua`). Raw `hl.bind` only for loops,
+  submaps and press/release pairs, with a `bind {}` without `run`
+  documenting them.
 - **Environment goes in `home/.config/env.d/NN-name.sh`** (POSIX sh, `ws_path`
   for PATH). Shells and the desktop session (IDEs) both load it.
 - **No secrets in git.** The repo is public. Secrets come from Bitwarden

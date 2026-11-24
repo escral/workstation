@@ -6,6 +6,7 @@ ShellRoot {
     Notifications {}
     VolumeOsd {}
     Launcher {}
+    HelpOverlay {}
 
     Variants {
         model: Quickshell.screens

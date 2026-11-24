@@ -180,25 +180,34 @@ Scope {
         }));
     }
 
-    readonly property var commands: [
-        ["Lock screen", ["lock"], "\u{F033E}", ["quickshell", "ipc", "call", "lock", "lock"]],
-        ["Log out", ["exit", "sign out", "logout"], "\u{F0343}", ["uwsm", "stop"]],
-        ["Suspend", ["sleep"], "\u{F04B2}", ["systemctl", "suspend"]],
-        ["Reboot", ["restart"], "\u{F0709}", ["systemctl", "reboot"]],
-        ["Power off", ["shutdown", "shut down", "turn off"], "\u{F0425}", ["systemctl", "poweroff"]],
-    ]
+    // Actions come from the catalog Hyprland writes on every config load
+    // (hypr/catalog.lua); Hyprland runs them, so Lua ones work too.
+    property var catalog: []
 
-    // Actions are the system commands for now; the action catalog (PLAN.md)
-    // will add to them.
+    FileView {
+        path: (Quickshell.env("XDG_CACHE_HOME") || root.home + "/.cache") + "/ws/actions.json"
+        watchChanges: true
+        printErrors: false
+        onFileChanged: reload()
+        onLoaded: {
+            try {
+                root.catalog = JSON.parse(text()).filter(e => e.launcher && e.runs);
+            } catch (e) {
+                root.catalog = [];
+            }
+        }
+        onLoadFailed: root.catalog = []
+    }
+
     function actions(q) {
-        return commands.map(([name, words, glyph, cmd]) => ({
-            key: "action:" + name,
-            score: q === "" ? 0 : match(q, [name, ...words]),
-            name: name,
-            sub: "",
-            glyph: glyph,
+        return catalog.map(e => ({
+            key: "action:" + e.title,
+            score: q === "" ? 0 : match(q, [e.title, e.group, ...e.words]),
+            name: e.title,
+            sub: [e.group, e.keys.join(" or ")].filter(s => s).join("  ·  "),
+            glyph: e.glyph || "\u{F0E7}",
             enter: "run",
-            run: () => Quickshell.execDetached(cmd),
+            run: () => Quickshell.execDetached(["hyprctl", "dispatch", "ws_action(" + JSON.stringify(e.title) + ")"]),
         }));
     }
 

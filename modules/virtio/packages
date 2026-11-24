@@ -1,0 +1,2 @@
+# virgl gives the VM OpenGL only; Vulkan apps (Zed) run on the CPU here.
+vulkan-swrast

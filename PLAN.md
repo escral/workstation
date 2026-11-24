@@ -9,7 +9,7 @@ workstation. Not a distro — a layer on top of Arch.
 |---|---|---|
 | Base | Arch Linux (`archinstall`, then `boot.sh`) | Rolling, AUR has Hyprland/Quickshell, fast iteration |
 | Compositor | Hyprland | Biggest ecosystem; Quickshell works with it |
-| Terminal | Ghostty: background service + D-Bus ≈130ms; splits/tabs are Hyprland windows/groups. Super+Enter opens where the focused app works (Ghostty: self-split; others: deepest interactive child's cwd) | One navigation system (Super+hjkl) for everything; context-aware terminal |
+| Terminal | Ghostty: background service + D-Bus ≈130ms; splits/tabs are Hyprland windows/groups. Super+Enter opens where the focused app works (Ghostty: self-split; JetBrains IDEs and Zed: the project root; others: deepest interactive child's cwd) | One navigation system (Super+hjkl) for everything; context-aware terminal |
 | Shell UI | Quickshell | Bar, launcher, notifications, OSD, help overlay — replaces dunst/rofi/i3status |
 | GUI fallback | nm-connection-editor (VPN/proxy), pavucontrol, blueman | Configure things by GUI when no tool exists. Full GNOME session dropped (~1GB) — revisit if needed |
 | Session | greetd + Quickshell login screen (in cage) → `uwsm start hyprland.desktop` | Login looks like the lock screen; uwsm = systemd-managed session: clean env, apps as units, proper logout |
@@ -117,8 +117,8 @@ action { title = "Sync project marks", run = "marks-sync /var/www", terminal = t
 - App-internal keys (Ghostty, Zed, IDEs) stay in each app's config; the
   catalog only describes them for the help. A generator that writes them is
   for later, with the theme generator (item 6), if the two copies drift.
-- Later: `confirm = true` for Log out / Power off; providers for actions with
-  a parameter from the system (one per VPN connection, one per theme).
+- Later: providers for actions with a parameter from the system (one per VPN
+  connection, one per theme).
 
 ## Help overlay
 
@@ -130,8 +130,6 @@ action { title = "Sync project marks", run = "marks-sync /var/www", terminal = t
   left to press; rows the held modifiers can't reach dim whole. Hyprland
   tracks the modifiers in Lua and writes the state to a file the overlay
   watches.
-- Later: a leader key into Hyprland submaps (`w` window, `s` screenshot...)
-  with a which-key popup at each step.
 
 ## Roadmap
 
@@ -140,10 +138,10 @@ action { title = "Sync project marks", run = "marks-sync /var/www", terminal = t
 2b. [x] Time: NTP sync (systemd-timesyncd) and timezone per profile
 3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, terminal → Ghostty ✓, git ✓, scripts ✓ (`marks-sync`, `vpn`; the rest replaced or dropped); nvim left
 4. [x] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓, launcher ✓, app glyphs ✓, calendar popup ✓, "no results" line in the launcher ✓, attention indicator in place of a tray (LauncherEntry unread counts, our notifications, urgent windows, SNI NeedsAttention) ✓
-5. [x] Action catalog, designed together with 6: `bind {}` / `action {}` in `actions.d/` ✓, launcher's Actions from it ✓, existing hotkeys moved over ✓, help overlay on Super+/ ✓; later: `confirm`, providers, leader key
+5. [x] Action catalog, designed together with 6: `bind {}` / `action {}` in `actions.d/` ✓, launcher's Actions from it ✓, existing hotkeys moved over ✓, help overlay on Super+/ ✓; later: providers
 6. [ ] Theme tokens + generators: mainly one place for the colours every app uses; switching themes (an action) is a nice extra
 7. [x] Secrets from Bitwarden (`ws secrets`: SSH keys, ssh hosts, git identity) ✓; app state backup/restore to a USB drive (`ws backup` / `ws restore`) ✓
 8. [ ] AI module (embeddings search, first in the launcher; whisper dictation, piper)
 9. [ ] Install on home PC (wipe Linux partition, keep Windows). Windows keeps the hardware clock in local time and Linux in UTC: set Windows to UTC (`RealTimeIsUniversal`) or the clock jumps by 2h between them. Moving from the current Ubuntu: its `~/.local/share/keyrings` opens here if the login password is the same; else move the `<App> Safe Storage` keys by hand (`secret-tool`)
-10. [ ] IDE-aware Super+Enter: JetBrains (title → recentProjects.xml), Zed
+10. [x] IDE-aware Super+Enter: JetBrains (window title → `recentProjects.xml`), Zed (title → its `workspaces` table)
 11. [ ] Timers module (pomodoro, reminders via systemd timers)

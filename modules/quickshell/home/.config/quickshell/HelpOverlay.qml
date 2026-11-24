@@ -99,7 +99,7 @@ Scope {
         id: window
         screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
         // Mapped all the time and never taking input: mapping anew on every
-        // hold would add a layer fade and a fresh surface.
+        // open would add a layer fade and a fresh surface.
         mask: Region {}
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.namespace: "ws-help"

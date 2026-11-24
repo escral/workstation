@@ -1,7 +1,7 @@
 -- Super+/ opens the help and Esc (or Super+/ again) closes it. While it is
 -- up, the modifiers pressed since mark what they reach. The state goes to a
--- file the help watches: writes keep their order, where separate ipc calls
--- could arrive out of turn and leave it on screen.
+-- file the help watches: writes keep their order, so a close can't land
+-- before the open it follows.
 --
 -- Keys go by keycode: Alt+Shift switches the layout here, and then one of
 -- the two reports ISO_Next_Group instead of its own name, so a release bound

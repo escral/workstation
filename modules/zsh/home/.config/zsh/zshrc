@@ -11,6 +11,9 @@ DISABLE_MAGIC_FUNCTIONS=true
 
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
+# zsh picks vi keys when $EDITOR mentions vi, and it is nvim.
+bindkey -e
+
 # Modules: what oh-my-zsh must see before it starts (fpath).
 for f in ~/.config/zsh/conf.d/*.pre.zsh(N); do source $f; done
 

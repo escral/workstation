@@ -87,6 +87,7 @@ AI_TIER=gpu
 | login | greetd + cage running the Quickshell login screen → uwsm Hyprland | all |
 | fonts | FiraCode Nerd, Noto, emoji | all |
 | zsh | zsh, oh-my-zsh without plugins, autosuggestions, starship; chsh | all |
+| nvim | Neovim as `$EDITOR` and `vim`: ordinary-editor keys (Ctrl+S/Z/C/X, Shift+arrows, Tab indent), Tokyo Night from the theme, treesitter (Vue, TS, CSS, HTML, PHP, XML, JSON, YAML...), language servers from pacman (TS + Vue, CSS, HTML, JSON, YAML, PHP via intelephense, bash, Lua) with built-in completion, fzf-lua on Ctrl+P. Plugins by `vim.pack`, pinned in the repo's lock file. `common.vim` is shared with IdeaVim | all |
 | hypr | Hyprland, portals, polkit agent, screenshots, xdg-user-dirs | all |
 | quickshell | Bar, shader background, lock screen + idle lock/DPMS, notification popups, volume OSD, mute/offline/load indicators, calendar popup (click the date), red attention pills for apps with unread (LauncherEntry counts, else notifications from apps with a desktop entry; script notify-send only pops up), plus a dot on their workspace (no tray), launcher (Super+Space all, Super+D apps, Super+P projects from fzf-marks, Super+Ctrl+P actions; also windows, calculator, web), app glyphs instead of an icon theme | all |
 | claude | Claude desktop app (AUR repack of the official .deb; opens on the AI workspace, dark by its own flag), Claude Code CLI (native installer, updates itself), `~/.claude/settings.json` in the repo | home, work, vm |
@@ -97,7 +98,7 @@ AI_TIER=gpu
 | nvidia | nvidia-open + Wayland bits | home |
 | intel / virtio | The GPU's Vulkan driver (vulkan-intel; vulkan-swrast in the VM, where virgl is GL only), so Vulkan apps don't pull nvidia-utils | work / vm |
 | dev-node / dev-bun / dev-php | fnm / bun / php+composer | home, work |
-| jetbrains | Toolbox from JetBrains' latest release (updates itself and the IDEs); PhpStorm/WebStorm installed from it; its scripts on PATH for `ide`; kept out of XDG autostart (no tray here) | home, work, vm |
+| jetbrains | Toolbox from JetBrains' latest release (updates itself and the IDEs); PhpStorm/WebStorm installed from it; its scripts on PATH for `ide`; kept out of XDG autostart (no tray here); IdeaVim in every IDE, `~/.config/ideavim/ideavimrc` says which keys go to Vim and which to the IDE | home, work, vm |
 | zed | Zed as the quick plain editor: Tokyo Night, FiraCode 18, line height 1.4; minimal chrome, no AI, no language servers, telemetry off | home, work, vm |
 
 ## Action catalog
@@ -138,7 +139,7 @@ action { title = "Sync project marks", run = "marks-sync /var/www", terminal = t
 1. [x] Skeleton, `ws` CLI, bootstrap, starter modules/profiles
 2. [x] VM: `ws vm base` + `ws vm fresh` green, Hyprland (Lua config) + Quickshell bar running
 2b. [x] Time: NTP sync (systemd-timesyncd) and timezone per profile
-3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, terminal → Ghostty ✓, git ✓, scripts ✓ (`marks-sync`, `vpn`; the rest replaced or dropped); nvim left
+3. [x] Port from `~/.dotfiles`: zsh ✓, fzf ✓, terminal → Ghostty ✓, git ✓, scripts ✓ (`marks-sync`, `vpn`; the rest replaced or dropped), nvim + IdeaVim ✓
 4. [x] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓, launcher ✓, app glyphs ✓, calendar popup ✓, "no results" line in the launcher ✓, attention indicator in place of a tray (LauncherEntry unread counts, our notifications, urgent windows, SNI NeedsAttention) ✓
 5. [x] Action catalog, designed together with 6: `bind {}` / `action {}` in `actions.d/` ✓, launcher's Actions from it ✓, existing hotkeys moved over ✓, help overlay on Super+/ ✓; later: providers
 6. [x] Theme tokens: `themes/tokyo-night` ✓, `theme/` templates for Quickshell, Hyprland, Ghostty, starship, btop ✓, `ws theme NAME` with live reload ✓; later: a launcher action per theme (provider)

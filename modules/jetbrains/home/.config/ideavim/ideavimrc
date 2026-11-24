@@ -1,0 +1,36 @@
+" Keys both IdeaVim and the IDE want: a:ide keeps the IDE's action.
+sethandler <C-a> a:ide
+sethandler <C-c> a:ide
+sethandler <C-d> a:ide
+sethandler <C-e> a:ide
+sethandler <C-f> a:ide
+sethandler <C-k> a:ide
+sethandler <C-n> a:ide
+sethandler <C-o> a:ide
+sethandler <C-p> a:ide
+sethandler <C-r> a:ide
+sethandler <C-s> a:ide
+sethandler <C-t> a:ide
+sethandler <C-u> a:ide
+sethandler <C-v> a:ide
+sethandler <C-w> a:ide
+sethandler <C-x> a:ide
+sethandler <C-[> a:ide
+sethandler <C-]> a:ide
+sethandler <S-Up> a:ide
+sethandler <S-Down> a:ide
+sethandler <S-Tab> a:ide
+sethandler <F1> a:ide
+sethandler <C-h> a:vim
+sethandler <C-i> a:vim
+sethandler <C-l> a:vim
+sethandler <C-\> a:vim
+sethandler <C-Left> a:vim
+sethandler <C-Right> a:vim
+sethandler <S-CR> a:vim
+sethandler <Tab> a:vim
+
+source ~/.config/nvim/common.vim
+set visualbell
+nnoremap <leader><space> :nohlsearch<CR>
+noremap <C-b> <C-d>

@@ -31,6 +31,18 @@ if [[ ! -f $entry ]]; then
     'StartupWMClass=jetbrains-toolbox' >"$entry"
 fi
 
+# IdeaVim in every IDE Toolbox installed. Its key settings are in
+# ~/.config/ideavim, so the plugin is all an IDE needs. installPlugins starts
+# the IDE headless, which fails while that IDE is open: then next time.
+for product in "$HOME"/.local/share/JetBrains/Toolbox/apps/*/product-info.json; do
+  [[ -f $product ]] || continue
+  data=$(jq -r .dataDirectoryName "$product")
+  [[ -d $HOME/.local/share/JetBrains/$data/IdeaVIM ]] && continue
+  info "installing IdeaVim into $data"
+  "${product%/*}/$(jq -r '.launch[0].launcherPath' "$product")" installPlugins IdeaVIM >/dev/null 2>&1 \
+    || warn "could not install IdeaVim into $data (is it open?)"
+done
+
 # Toolbox re-adds itself to XDG autostart on every run, to start hidden in a
 # tray this desktop does not have. Masking the unit uwsm would start for it
 # keeps it from running unseen.

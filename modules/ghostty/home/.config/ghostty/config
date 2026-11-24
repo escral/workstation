@@ -31,4 +31,3 @@ keybind = ctrl+backspace=text:\x1b\x7f
 # Ctrl+A then Backspace or Delete clears the line, like select-all + delete.
 keybind = ctrl+a>backspace=text:\x15
 keybind = ctrl+a>delete=text:\x15
-keybind = ctrl+p=text:\x14

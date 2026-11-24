@@ -1,0 +1,12 @@
+neovim
+# nvim-treesitter builds its parsers with it.
+tree-sitter-cli
+# Language servers. Vue's runs inside the TypeScript one as a plugin.
+typescript-language-server
+vue-language-server
+vscode-css-languageserver
+vscode-html-languageserver
+vscode-json-languageserver
+yaml-language-server
+bash-language-server
+lua-language-server

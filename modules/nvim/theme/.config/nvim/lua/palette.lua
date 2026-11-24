@@ -1,0 +1,20 @@
+-- Tokyo Night's colour names, filled from the theme.
+return {
+    bg = "#{{bg}}",
+    bg_dark = "#{{bg_dark}}",
+    bg_highlight = "#{{highlight}}",
+    bg_visual = "#{{selection}}",
+    terminal_black = "#{{border}}",
+    fg = "#{{text}}",
+    fg_dark = "#{{subtext}}",
+    comment = "#{{muted}}",
+    blue = "#{{blue}}",
+    cyan = "#{{cyan}}",
+    green1 = "#{{teal}}",
+    magenta = "#{{magenta}}",
+    purple = "#{{purple}}",
+    orange = "#{{orange}}",
+    yellow = "#{{yellow}}",
+    green = "#{{green}}",
+    red = "#{{red}}",
+}

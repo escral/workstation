@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Bookmarks every folder inside the given ones in ~/.fzf-marks, so new
+# projects show up in fzm and in the launcher's Projects (Super+P).
+#   marks-sync DIR[:PREFIX]...
+#   marks-sync /var/www /var/www/tmg:tmg/ /var/www/c2b:c2b/
+# The label is PREFIX plus the folder name. A folder already bookmarked, under
+# any label, is left as it is.
+set -euo pipefail
+
+marks=${FZF_MARKS_FILE:-$HOME/.fzf-marks}
+if (($# == 0)); then
+  echo "usage: marks-sync DIR[:PREFIX]..." >&2
+  exit 1
+fi
+touch "$marks"
+
+added=0
+for arg in "$@"; do
+  dir=${arg%%:*} prefix=''
+  [[ $arg == *:* ]] && prefix=${arg#*:}
+  if [[ ! -d $dir ]]; then
+    echo "marks-sync: not a folder: $dir" >&2
+    continue
+  fi
+  dir=$(realpath -- "$dir")
+  for sub in "$dir"/*/; do
+    [[ -d $sub ]] || continue
+    sub=${sub%/}
+    # Marks are "label : path"; compare whole paths, so /var/www/app does
+    # not hide /var/www/app2.
+    if awk -F ' : ' -v p="$sub" '{ sub(/\/$/, "", $2) } $2 == p { f = 1; exit } END { exit !f }' "$marks"; then
+      continue
+    fi
+    printf '%s : %s\n' "$prefix${sub##*/}" "$sub" >>"$marks"
+    echo "  + $prefix${sub##*/}"
+    added=$((added + 1))
+  done
+done
+echo "marks-sync: $added new"

@@ -9,9 +9,15 @@ dir=$HOME/.local/share/JetBrains/Toolbox
 if [[ ! -x $dir/bin/jetbrains-toolbox ]]; then
   url=$(curl -fsSL 'https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release' \
     | jq -r '.TBA[0].downloads.linux.link')
+  [[ $url == https://* ]] || die "no Toolbox download link from JetBrains"
   info "downloading ${url##*/}"
-  mkdir -p "$dir"
-  curl -fsSL "$url" | tar -xz -C "$dir" --strip-components=1
+  # Unpacked aside and moved in whole: a download cut short must not leave
+  # a half Toolbox that the check above takes for installed.
+  rm -rf "$dir.part"
+  mkdir -p "$dir.part"
+  curl -fsSL "$url" | tar -xz -C "$dir.part" --strip-components=1
+  rm -rf "$dir"
+  mv "$dir.part" "$dir"
 fi
 ln -sfn "$dir/bin/jetbrains-toolbox" "$HOME/.local/bin/jetbrains-toolbox"
 

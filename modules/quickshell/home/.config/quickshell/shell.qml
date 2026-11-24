@@ -14,7 +14,8 @@ ShellRoot {
             required property var modelData
 
             Background { screen: modelData }
-            Bar { screen: modelData }
+            Calendar { id: calendar; screen: modelData }
+            Bar { screen: modelData; onDateClicked: calendar.toggle() }
         }
     }
 }

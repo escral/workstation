@@ -7,6 +7,8 @@ import QtQuick
 PanelWindow {
     id: bar
 
+    signal dateClicked()
+
     readonly property var monitor: Hyprland.monitorFor(screen)
 
     function levelColor(level) {
@@ -167,6 +169,12 @@ PanelWindow {
             text: `<font color="${Theme.subtext}">${Qt.formatDateTime(clock.date, "ddd dd.MM.yyyy")}</font>`
                 + `<font color="${Theme.border}">  ·  </font>`
                 + `<b>${Qt.formatDateTime(clock.date, "HH:mm")}</b>`
+
+            MouseArea {
+                anchors { fill: parent; margins: -6 }
+                cursorShape: Qt.PointingHandCursor
+                onClicked: bar.dateClicked()
+            }
         }
     }
 }

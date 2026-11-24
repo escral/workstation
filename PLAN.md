@@ -130,10 +130,11 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 2. [x] VM: `ws vm base` + `ws vm fresh` green, Hyprland (Lua config) + Quickshell bar running
 2b. [x] Time: NTP sync (systemd-timesyncd) and timezone per profile
 3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, kitty → ghostty ✓, git ✓, scripts ✓ (`marks-sync`, `vpn`; the rest replaced or dropped); nvim left
-4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓, launcher ✓, app glyphs ✓, calendar popup ✓, "no results" line in the launcher ✓, attention indicator in place of a tray (LauncherEntry unread counts, our notifications, urgent windows, SNI NeedsAttention) ✓; left: a timers module (pomodoro, reminders via systemd timers)
-5. [ ] Theme tokens + generators
-6. [ ] Action catalog generator + help overlay; the catalog feeds the launcher's Actions
+4. [x] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓, launcher ✓, app glyphs ✓, calendar popup ✓, "no results" line in the launcher ✓, attention indicator in place of a tray (LauncherEntry unread counts, our notifications, urgent windows, SNI NeedsAttention) ✓
+5. [ ] Action catalog, designed together with 6: custom actions declared in modules, feeding the launcher's Actions and the help overlay
+6. [ ] Theme tokens + generators, so the theme can be switched (likely an action itself)
 7. [x] Secrets from Bitwarden (`ws secrets`: SSH keys, ssh hosts, git identity) ✓; app state backup/restore to a USB drive (`ws backup` / `ws restore`) ✓
 8. [ ] AI module (embeddings search, first in the launcher; whisper dictation, piper)
 9. [ ] Install on home PC (wipe Linux partition, keep Windows). Windows keeps the hardware clock in local time and Linux in UTC: set Windows to UTC (`RealTimeIsUniversal`) or the clock jumps by 2h between them. Moving from the current Ubuntu: its `~/.local/share/keyrings` opens here if the login password is the same; else move the `<App> Safe Storage` keys by hand (`secret-tool`)
-10. [ ] IDE-aware Super+Enter: JetBrains (title → recentProjects.xml), VS Code/Cursor, when those modules exist
+10. [ ] IDE-aware Super+Enter: JetBrains (title → recentProjects.xml), Zed
+11. [ ] Timers module (pomodoro, reminders via systemd timers)

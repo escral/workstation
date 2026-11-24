@@ -18,8 +18,6 @@ Singleton {
     // apps replace a notification under the same id as messages pile up.
     property var unread: ({})
 
-    // The focused window's class, straight from Hyprland's event: it comes
-    // with the class, no toplevel lookup in between.
     property string focused: ""
 
     Connections {
@@ -32,8 +30,7 @@ Singleton {
 
     onFocusedChanged: forget(u => u.names.includes(focused))
 
-    // Drops the apps the test picks. No Object.fromEntries: Qt's JS engine
-    // lacks it.
+    // A loop, not Object.fromEntries: Qt's JS engine lacks it.
     function forget(test) {
         const u = {};
         let dropped = false;
@@ -110,7 +107,6 @@ Singleton {
         }
     }
 
-    // Called by the notification server for every notification.
     function notified(n) {
         if (n.urgency === NotificationUrgency.Low)
             return;

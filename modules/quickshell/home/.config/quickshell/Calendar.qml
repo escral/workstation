@@ -101,7 +101,6 @@ PanelWindow {
                 event.accepted = true;
             }
 
-            // A click here brings today's month back.
             Item {
                 width: grid.width
                 height: 40

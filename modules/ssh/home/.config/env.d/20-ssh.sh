@@ -1,3 +1,3 @@
-# The systemd user agent (ssh-agent.socket): a key's passphrase is asked once
-# per session, and the desktop's apps (IDEs) share it.
+# One agent for terminals and desktop apps (IDEs) alike, so a key's
+# passphrase is asked once per session.
 export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"

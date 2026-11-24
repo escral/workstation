@@ -31,6 +31,8 @@ cmd_secrets() {
   if [[ -z $(rbw config show | jq -r '.email // empty') ]]; then
     read -rp "Bitwarden email: " name
     rbw config set email "$name"
+    read -rp "Bitwarden server (empty for bitwarden.com, or e.g. https://vault.bitwarden.eu): " name
+    [[ -z $name ]] || rbw config set base_url "$name"
   fi
   rbw unlock
   rbw sync

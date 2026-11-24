@@ -131,9 +131,8 @@ PanelWindow {
             anchors { right: date.left; rightMargin: 24; top: parent.top; bottom: parent.bottom }
             spacing: 16
 
-            // Apps with something unread, in red so the eye catches them;
-            // click opens, right click dismisses what came by notification
-            // (an app's own count only clears when it's read).
+            // Red so the eye catches them. Right click can only dismiss a
+            // notification count: an app's own count clears once it's read.
             Repeater {
                 model: Attention.items
 

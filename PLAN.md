@@ -122,8 +122,8 @@ action { title = "Sync project marks", run = "marks-sync /var/www", terminal = t
 
 ## Help overlay
 
-- Super+? opens the catalog's hotkeys, grouped, in as many columns as the
-  screen fits; Esc or Super+? again closes. Not on a held Super: Super is
+- Super+/ opens the catalog's hotkeys, grouped, in as many columns as the
+  screen fits; Esc or Super+/ again closes. Not on a held Super: Super is
   often held while deciding what to press.
 - Entries with `app = "<class>"` show only while that app is focused.
 - While it is up, held keys are marked on every row, so each shows what is
@@ -140,7 +140,7 @@ action { title = "Sync project marks", run = "marks-sync /var/www", terminal = t
 2b. [x] Time: NTP sync (systemd-timesyncd) and timezone per profile
 3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, terminal → Ghostty ✓, git ✓, scripts ✓ (`marks-sync`, `vpn`; the rest replaced or dropped); nvim left
 4. [x] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓, launcher ✓, app glyphs ✓, calendar popup ✓, "no results" line in the launcher ✓, attention indicator in place of a tray (LauncherEntry unread counts, our notifications, urgent windows, SNI NeedsAttention) ✓
-5. [x] Action catalog, designed together with 6: `bind {}` / `action {}` in `actions.d/` ✓, launcher's Actions from it ✓, existing hotkeys moved over ✓, help overlay on Super+? ✓; later: `confirm`, providers, leader key
+5. [x] Action catalog, designed together with 6: `bind {}` / `action {}` in `actions.d/` ✓, launcher's Actions from it ✓, existing hotkeys moved over ✓, help overlay on Super+/ ✓; later: `confirm`, providers, leader key
 6. [ ] Theme tokens + generators: mainly one place for the colours every app uses; switching themes (an action) is a nice extra
 7. [x] Secrets from Bitwarden (`ws secrets`: SSH keys, ssh hosts, git identity) ✓; app state backup/restore to a USB drive (`ws backup` / `ws restore`) ✓
 8. [ ] AI module (embeddings search, first in the launcher; whisper dictation, piper)

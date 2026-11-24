@@ -8,6 +8,8 @@ source "$WS_ROOT/lib/common.sh"
 source "$WS_ROOT/lib/stow.sh"
 # shellcheck source=../lib/packages.sh
 source "$WS_ROOT/lib/packages.sh"
+# shellcheck source=../lib/secrets.sh
+source "$WS_ROOT/lib/secrets.sh"
 
 usage() {
   cat <<USAGE
@@ -18,6 +20,7 @@ usage: ws <command> [args]
   update                     git pull, system upgrade, then install
   drift                      packages installed but not declared, and vice versa
   profile [NAME]             show current profile, or switch to NAME
+  secrets [--force]          pull files into ~ from the Bitwarden folder "workstation"
   vm <sub>                   VM harness (ws vm help)
   help                       this text
 USAGE
@@ -138,6 +141,7 @@ main() {
     update)  cmd_update "$@" ;;
     drift)   cmd_drift "$@" ;;
     profile) cmd_profile "$@" ;;
+    secrets) cmd_secrets "$@" ;;
     vm)      exec bash "$WS_ROOT/vm/vm.sh" "$@" ;;
     help|-h|--help) usage ;;
     *) usage; exit 1 ;;

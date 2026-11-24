@@ -43,8 +43,9 @@ vm/              QEMU test harness
   One explicit `hl.bind` line per binding; loops only for workspace numbers.
 - **Environment goes in `home/.config/env.d/NN-name.sh`** (POSIX sh, `ws_path`
   for PATH). Shells and the desktop session (IDEs) both load it.
-- **No secrets in git.** The repo is public. Secrets come from Bitwarden; app
-  state comes from the restic backup.
+- **No secrets in git.** The repo is public. Secrets come from Bitwarden
+  (`ws secrets`, vault folder `workstation`); app state comes from the
+  restic backup.
 - **Test in the VM**, never by installing on the host.
 - **Commits:** imperative, scoped (`hypr: ...`, `vm: ...`). Commit or push
   only when asked.

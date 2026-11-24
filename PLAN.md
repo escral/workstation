@@ -22,7 +22,7 @@ workstation. Not a distro — a layer on top of Arch.
 | Baseline | `base` = only what the layer needs to operate (git, stow, curl, base-devel, `ws` on PATH). Every feature — even network/audio — is a module | Simple parts and their advanced config live together in one module |
 | Dotfiles | GNU Stow, `--no-folding`, symlinks into this repo | Live editing, Quickshell hot reload |
 | Runtimes | fnm (Node), official installer (Bun), pacman (PHP) | Each tool's native way |
-| Secrets | Bitwarden (`rbw`) — SSH keys fetched at bootstrap | Repo stays public, nothing encrypted in git |
+| Secrets | Bitwarden (`rbw`): `ws secrets` after install writes the vault folder `workstation` into ~ | Repo stays public, nothing encrypted in git |
 | App state | restic backup of Chrome/Slack/Telegram + keyring, key in Bitwarden | Config in git, state in backup. Never in git |
 | Theme | One token file → generated configs for every app | Theme switch = one change |
 | Bindings | Action catalog (`actions.toml` per module) generates hypr/kitty bind files, help overlay, launcher catalog | One source of truth |
@@ -72,7 +72,9 @@ AI_TIER=gpu
 | base | git, stow, curl, base-devel, pacman tweaks, `ws` on PATH | all |
 | network | NetworkManager, nm-connection-editor | all |
 | audio | pipewire, wireplumber, pavucontrol | all |
-| ssh | openssh (later: keys from Bitwarden) | all |
+| secrets | rbw; `ws secrets` writes the Bitwarden folder `workstation` into ~, each item named by its path: SSH key items give the key and `.pub` (`.ssh/id_rsa`), notes their text (`.ssh/config.local`, `.config/git/identity`) | all |
+| ssh | openssh, ssh-agent (systemd user socket, keys added on first use), `~/.ssh/config` including `config.local` (hosts, from Bitwarden) | all |
+| git | `~/.config/git/config` (Bitbucket over ssh); name and email in `identity`, from Bitwarden | all |
 | cli | fzf, fzf-marks, ripgrep, fd, jq, unzip, man-db, btop, `ide` (opens a project in PhpStorm/WebStorm) | all |
 | firewall | ufw | all |
 | maintenance | pacman-contrib, paccache.timer | all |
@@ -122,7 +124,7 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓, launcher ✓, app glyphs ✓, calendar popup ✓, attention indicator in place of a tray (LauncherEntry unread counts, our notifications, urgent windows, SNI NeedsAttention) ✓; left: a timers module (pomodoro, reminders via systemd timers)
 5. [ ] Theme tokens + generators
 6. [ ] Action catalog generator + help overlay; the catalog feeds the launcher's Actions
-7. [ ] Bitwarden SSH restore, restic state backup/restore
+7. [~] Secrets from Bitwarden (`ws secrets`: SSH keys, ssh hosts, git identity) ✓; restic state backup/restore left
 8. [ ] AI module (embeddings search, first in the launcher; whisper dictation, piper)
 9. [ ] Install on home PC (wipe Linux partition, keep Windows)
 10. [ ] IDE-aware Super+Enter: JetBrains (title → recentProjects.xml), VS Code/Cursor, when those modules exist

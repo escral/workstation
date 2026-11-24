@@ -1,0 +1,14 @@
+# Name and email come from Bitwarden (ws secrets): the repo is public.
+[include]
+	path = identity
+
+[core]
+	autocrlf = input
+
+[init]
+	defaultBranch = master
+
+[url "git@ssh.bitbucket.org:"]
+	insteadOf = https://bitbucket.org/
+	insteadOf = git@bitbucket.org:
+	insteadOf = ssh://git@bitbucket.org/

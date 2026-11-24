@@ -111,8 +111,12 @@ Singleton {
         if (n.urgency === NotificationUrgency.Low)
             return;
         const entry = DesktopEntries.byId(n.desktopEntry) ?? DesktopEntries.heuristicLookup(n.appName);
+        // Scripts notify too (notify-send); with no app behind them, a pill
+        // would have nothing to open.
+        if (!entry)
+            return;
         const names = namesOf(entry, n.desktopEntry, n.appName);
-        if (names.length === 0 || names.includes(focused) || hasBadge(names))
+        if (names.includes(focused) || hasBadge(names))
             return;
         const key = names[0];
         const u = Object.assign({}, unread);
@@ -145,6 +149,8 @@ Singleton {
                     focus(t);
                 else if (app.appId)
                     Quickshell.execDetached(["uwsm", "app", "--", app.appId + ".desktop"]);
+                else
+                    dismiss?.();
             },
             dismiss: dismiss,
         };

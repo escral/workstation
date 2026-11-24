@@ -12,11 +12,20 @@ Scope {
 
     property bool open: false
     property var entries: []
+    // Modifiers held besides Super, e.g. ["SHIFT"].
+    property var mods: []
 
     IpcHandler {
         target: "help"
-        function hold(): void { root.open = true }
-        function release(): void { root.open = false }
+        // mods: the other held modifiers, comma separated, or "none".
+        function hold(mods: string): void {
+            root.mods = mods === "none" ? [] : mods.split(",");
+            root.open = true;
+        }
+        function release(): void {
+            root.open = false;
+            root.mods = [];
+        }
     }
 
     FileView {
@@ -81,6 +90,19 @@ Scope {
         return combo.split(/\s*\+\s*/).map(p => capNames[p.toUpperCase()] ?? (p.length === 1 ? p.toUpperCase() : p));
     }
 
+    // Reachable when one of its combos holds Super and every held modifier:
+    // its held caps dim and the rest show what is left to press. Rows that
+    // can't be reached dim whole rather than hide, so nothing moves while
+    // modifiers come and go.
+    readonly property var heldCaps: ["Super", ...mods.map(m => capNames[m])]
+
+    function reachable(keys) {
+        return keys.some(k => {
+            const parts = k.toUpperCase().split(/\s*\+\s*/);
+            return parts.includes("SUPER") && mods.every(m => parts.includes(m));
+        });
+    }
+
     // "Super H" and "Super ←" read as one combo with "H / ←" as its last key.
     function capsOf(keys) {
         const all = keys.map(caps);
@@ -142,6 +164,7 @@ Scope {
 
                                     Item {
                                         required property var modelData
+                                        opacity: root.reachable(modelData.keys) ? 1 : 0.3
                                         width: root.columnWidth
                                         height: 24
 
@@ -162,19 +185,23 @@ Scope {
                                             Repeater {
                                                 model: root.capsOf(parent.parent.modelData.keys)
 
+                                                // A held key is outlined and lettered in the accent:
+                                                // set apart from the keys left to press, and from
+                                                // the grey of a row out of reach.
                                                 Rectangle {
                                                     required property string modelData
+                                                    readonly property bool held: root.heldCaps.includes(modelData)
                                                     width: cap.implicitWidth + 12
                                                     height: 20
                                                     radius: 5
-                                                    color: Theme.alpha(Theme.accent, 0.08)
-                                                    border { width: 1; color: Theme.border }
+                                                    color: held ? "transparent" : Theme.alpha(Theme.accent, 0.08)
+                                                    border { width: 1; color: held ? Theme.accent : Theme.border }
 
                                                     Text {
                                                         id: cap
                                                         anchors.centerIn: parent
                                                         text: parent.modelData
-                                                        color: Theme.text
+                                                        color: parent.held ? Theme.accent : Theme.text
                                                         font { family: Theme.font; pixelSize: 11 }
                                                     }
                                                 }

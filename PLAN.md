@@ -127,8 +127,11 @@ action { title = "Sync project marks", run = "marks-sync /var/www", terminal = t
   hotkeys, grouped, in as many columns as the screen fits; release hides it
   (a `transparent` release bind, which still fires after a combo).
 - Entries with `app = "<class>"` show only while that app is focused.
-- Later: Shift held narrows the list; a leader key into Hyprland submaps
-  (`w` window, `s` screenshot...) with a which-key popup at each step.
+- Held keys dim on every row, so each shows what is left to press; rows the
+  held modifiers can't reach dim whole. Hyprland tracks the modifiers in Lua
+  and tells Quickshell only while the help is up.
+- Later: a leader key into Hyprland submaps (`w` window, `s` screenshot...)
+  with a which-key popup at each step.
 
 ## Roadmap
 

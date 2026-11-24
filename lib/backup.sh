@@ -9,7 +9,6 @@ _ask() {
   [[ -z $reply || $reply == [yY]* ]]
 }
 
-# Active modules (or the ones named) that list app state in a `state` file.
 _state_modules() {
   local m
   (($#)) || set -- "${modules[@]}"
@@ -23,9 +22,6 @@ _state_paths() {
   read_list "$WS_ROOT/modules/$1/state" | sed "s|^|$HOME/|"
 }
 
-# Processes with files open under the given paths. Copying an open profile
-# catches SQLite files mid-write, and a restore under a running app gets
-# overwritten when it exits.
 _users_of() {
   local p
   for p in "$@"; do
@@ -35,6 +31,8 @@ _users_of() {
   done | cut -d/ -f3 | sort -u
 }
 
+# Copying an open profile catches SQLite files mid-write, and a restore under
+# a running app gets overwritten when it exits.
 _close_apps() {
   local pids names i
   mapfile -t pids < <(_users_of "$@")
@@ -49,9 +47,7 @@ _close_apps() {
   die "still running: $names"
 }
 
-# Sets DRIVE_MNT to the folder to use: the given one, or the one plugged-in
-# drive (mounted if needed), or the one picked from a list. DRIVE_DEV is the
-# drive's device, empty for a plain folder.
+# Sets DRIVE_MNT, and DRIVE_DEV for a drive (empty for a folder given by hand).
 _pick_drive() {
   local -a rows
   DRIVE_DEV='' DRIVE_MNT=''

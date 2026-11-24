@@ -1,0 +1,39 @@
+// Zed is the quick plain editor here; the IDEs do the real coding. So no AI,
+// no language servers (each new language would download one), and the
+// chrome around the text kept to tabs and a quiet status bar.
+{
+  "theme": { "mode": "dark", "dark": "Tokyo Night", "light": "Tokyo Night Light" },
+  "auto_install_extensions": { "tokyo-night": true },
+  "buffer_font_family": "FiraCode Nerd Font",
+  "buffer_font_size": 18,
+  "buffer_line_height": { "custom": 1.4 },
+  "ui_font_family": "FiraCode Nerd Font",
+  "ui_font_size": 16,
+
+  "disable_ai": true,
+  "enable_language_server": false,
+  "telemetry": { "diagnostics": false, "metrics": false },
+
+  "title_bar": {
+    "show_branch_icon": false,
+    "show_branch_name": false,
+    "show_onboarding_banner": false,
+    "show_user_picture": false,
+    "show_sign_in": false,
+    "show_menus": false
+  },
+  "toolbar": { "breadcrumbs": false, "quick_actions": false, "selections_menu": false },
+  "tab_bar": { "show_nav_history_buttons": false, "show_tab_bar_buttons": false },
+  "project_panel": { "button": false, "dock": "left" },
+  "outline_panel": { "button": false },
+  "collaboration_panel": { "button": false },
+  "notification_panel": { "button": false },
+  "git_panel": { "button": false },
+  "terminal": { "button": false },
+  "debugger": { "button": false },
+  "diagnostics": { "button": false },
+  "search": { "button": false },
+  "gutter": { "folds": false, "runnables": false, "breakpoints": false },
+  "scrollbar": { "show": "never" },
+  "indent_guides": { "enabled": false }
+}

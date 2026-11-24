@@ -14,7 +14,7 @@ workstation. Not a distro — a layer on top of Arch.
 | GUI fallback | nm-connection-editor (VPN/proxy), pavucontrol, blueman | Configure things by GUI when no tool exists. Full GNOME session dropped (~1GB) — revisit if needed |
 | Session | greetd + Quickshell login screen (in cage) → `uwsm start hyprland.desktop` | Login looks like the lock screen; uwsm = systemd-managed session: clean env, apps as units, proper logout |
 | Filesystem | **btrfs** (archinstall default subvolumes) — required at install time | Enables snapshots; can't be added later without reinstall |
-| Snapshots | snapper + snap-pac (snapshot before every pacman run), bootable snapshots | Rollback = Arch's replacement for "LTS stability" |
+| Snapshots | Maybe later: snapper + snap-pac, bootable snapshots | A broken upgrade can also be a reinstall: `ws install` + `ws restore` |
 | Updates | No unattended upgrades. `ws update` + notifier (checkupdates) + paccache.timer | Rolling release should be upgraded while watched |
 | Firewall | ufw: deny incoming, allow outgoing | Simple; note Docker bypasses ufw — bind to 127.0.0.1 |
 | Install | Plain bash + `ws` CLI. No Ansible, no mise | Most Ansible tasks were `shell:` anyway; less to learn, fewer deps |
@@ -23,7 +23,7 @@ workstation. Not a distro — a layer on top of Arch.
 | Dotfiles | GNU Stow, `--no-folding`, symlinks into this repo | Live editing, Quickshell hot reload |
 | Runtimes | fnm (Node), official installer (Bun), pacman (PHP) | Each tool's native way |
 | Secrets | Bitwarden (`rbw`): `ws secrets` after install writes the vault folder `workstation` into ~ | Repo stays public, nothing encrypted in git |
-| App state | restic backup of Chrome/Slack/Telegram + keyring, key in Bitwarden | Config in git, state in backup. Never in git |
+| App state | `ws backup` / `ws restore` to a USB drive (found and mounted by itself, or a folder given): restic repository `ws-backup`, encrypted with a password asked each run and kept nowhere. One snapshot per module, paths in its `state` file, caches in `state-exclude`. Running apps are offered to close | Config in git, state on the drive. Never in git. Chromium apps encrypt cookies and passwords with a key from the keyring, so the keyring goes too; it opens only under the same login password |
 | Theme | One token file → generated configs for every app | Theme switch = one change |
 | Bindings | Action catalog (`actions.toml` per module) generates hypr/kitty bind files, help overlay, launcher catalog | One source of truth |
 | Profiles | `profiles/<name>/` = modules + flags + overlay files (monitors, autostart, peripherals) | Whole-machine setup, not only hardware |
@@ -42,6 +42,7 @@ modules/<name>/
   home/                 stow package, mirrors $HOME
   setup.sh              optional idempotent hook (runs after packages + stow)
   actions.toml          optional bindings/actions for the catalog
+  state                 app state paths under ~ for `ws backup`; caches in state-exclude
 profiles/<name>/
   profile.sh            extends, modules, flags
   home/                 overlay, stowed after modules
@@ -78,6 +79,9 @@ AI_TIER=gpu
 | cli | fzf, fzf-marks, ripgrep, fd, jq, unzip, man-db, btop, `ide` (opens a project in PhpStorm/WebStorm) | all |
 | firewall | ufw | all |
 | maintenance | pacman-contrib, paccache.timer | all |
+| time | `TIMEZONE` from the profile, NTP via systemd-timesyncd | all |
+| backup | restic, udisks2; `ws backup` / `ws restore` save and bring back what modules list in `state` (chrome, telegram, slack, keyring) | all |
+| keyring | gnome-keyring, unlocked at login by PAM (greetd); holds the Chrome/Slack/Claude storage keys. After `ws restore keyring`, sign out and back in so the daemon reads it | all |
 | login | greetd + cage running the Quickshell login screen → uwsm Hyprland | all |
 | fonts | FiraCode Nerd, Noto, emoji | all |
 | zsh | zsh + plugins, chsh (config to port) | all |
@@ -120,13 +124,12 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 
 1. [x] Skeleton, `ws` CLI, bootstrap, starter modules/profiles
 2. [x] VM: `ws vm base` + `ws vm fresh` green, Hyprland (Lua config) + Quickshell bar running
-2a. [ ] Snapshots module: snapper + snap-pac + bootable snapshots
-2b. [ ] Time: NTP sync (systemd-timesyncd) and timezone per profile; the VM base image is UTC with no NTP
+2b. [x] Time: NTP sync (systemd-timesyncd) and timezone per profile
 3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, kitty → ghostty ✓; nvim, git, scripts left
 4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓, launcher ✓, app glyphs ✓, calendar popup ✓, attention indicator in place of a tray (LauncherEntry unread counts, our notifications, urgent windows, SNI NeedsAttention) ✓; left: a timers module (pomodoro, reminders via systemd timers)
 5. [ ] Theme tokens + generators
 6. [ ] Action catalog generator + help overlay; the catalog feeds the launcher's Actions
-7. [~] Secrets from Bitwarden (`ws secrets`: SSH keys, ssh hosts, git identity) ✓; restic state backup/restore left
+7. [x] Secrets from Bitwarden (`ws secrets`: SSH keys, ssh hosts, git identity) ✓; app state backup/restore to a USB drive (`ws backup` / `ws restore`) ✓
 8. [ ] AI module (embeddings search, first in the launcher; whisper dictation, piper)
-9. [ ] Install on home PC (wipe Linux partition, keep Windows)
+9. [ ] Install on home PC (wipe Linux partition, keep Windows). Windows keeps the hardware clock in local time and Linux in UTC: set Windows to UTC (`RealTimeIsUniversal`) or the clock jumps by 2h between them. Moving from the current Ubuntu: its `~/.local/share/keyrings` opens here if the login password is the same; else move the `<App> Safe Storage` keys by hand (`secret-tool`)
 10. [ ] IDE-aware Super+Enter: JetBrains (title → recentProjects.xml), VS Code/Cursor, when those modules exist

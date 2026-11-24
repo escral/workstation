@@ -3,6 +3,6 @@ action {
     group = "Session",
     glyph = "\u{F033E}",
     words = { "lock" },
-    keys = "SUPER + Escape",
+    keys = "SUPER + ALT + L",
     run = "quickshell ipc call lock lock",
 }

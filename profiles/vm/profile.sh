@@ -3,3 +3,4 @@ extends=base
 GPU=virtio
 AI_TIER=cpu
 FIREWALL_ALLOW="ssh"
+modules+=(chrome telegram slack)

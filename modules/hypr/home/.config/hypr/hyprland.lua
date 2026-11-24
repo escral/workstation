@@ -90,7 +90,26 @@ for id, name in pairs({ [1] = "Code", [2] = "Terminals", [3] = "AI", [9] = "Brow
     hl.workspace_rule({ workspace = tostring(id), default_name = name })
 end
 
--- Modules drop bindings into binds.d/, profiles drop overrides into local/.
+-- Where apps open. Rules for apps that aren't installed cost nothing, so the
+-- list covers likely future apps too. Chat apps start in the background, so
+-- they stay silent; the rest take focus along with them.
+local function place(name, class, workspace)
+    hl.window_rule({ name = name, match = { initial_class = class }, workspace = workspace })
+end
+place("vscode", "(?i)^(code|code-oss|com\\.microsoft\\.vscode|vscodium|codium)$", "1")
+place("jetbrains", "^jetbrains-(idea|idea-ce|webstorm|phpstorm|pycharm|pycharm-ce|goland|rider|clion|rustrover|datagrip|rubymine)$", "1")
+place("zed", "^dev\\.zed\\.Zed$", "1")
+place("claude", "^com\\.anthropic\\.Claude$", "3")
+place("cursor", "(?i)^cursor$", "3")
+place("windsurf", "(?i)^windsurf$", "3")
+place("chrome", "^(google-chrome|chromium)$", "9")
+place("firefox", "^firefox$", "9")
+place("telegram", "^org\\.telegram\\.desktop$", "10 silent")
+place("slack", "(?i)^slack$", "10 silent")
+place("discord", "(?i)^(discord|vesktop)$", "10 silent")
+
+-- Modules drop bindings into binds.d/ and app autostart into apps.d/;
+-- profiles drop overrides into local/.
 local function load_dir(name)
     local dir = os.getenv("HOME") .. "/.config/hypr/" .. name
     local ls = io.popen('ls "' .. dir .. '"/*.lua 2>/dev/null')
@@ -100,4 +119,5 @@ local function load_dir(name)
 end
 
 load_dir("binds.d")
+load_dir("apps.d")
 load_dir("local")

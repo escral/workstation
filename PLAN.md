@@ -82,6 +82,8 @@ AI_TIER=gpu
 | hypr | Hyprland, portals, polkit agent, screenshots, xdg-user-dirs | all |
 | quickshell | Bar, shader background, lock screen + idle lock/DPMS, notification popups, volume OSD, mute/offline/load indicators | all |
 | kitty | kitty (config to port) | all |
+| chrome | Google Chrome, opens on the Browser workspace | vm |
+| telegram / slack | Telegram, Slack: start with the session on the Chat workspace | vm |
 | bluetooth | bluez, blueman | home |
 | nvidia | nvidia-open + Wayland bits | home |
 | dev-node / dev-bun / dev-php | fnm / bun / php+composer | home, work |
@@ -117,7 +119,7 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 2a. [ ] Snapshots module: snapper + snap-pac + bootable snapshots
 2b. [ ] Time: NTP sync (systemd-timesyncd) and timezone per profile; the VM base image is UTC with no NTP
 3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, kitty → ghostty ✓; nvim, git, scripts left
-4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓; tray, per-profile autostart left
+4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓; tray left
 5. [ ] Theme tokens + generators
 6. [ ] Action catalog generator + help overlay
 7. [ ] Bitwarden SSH restore, restic state backup/restore

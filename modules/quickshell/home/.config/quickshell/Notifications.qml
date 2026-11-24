@@ -14,6 +14,7 @@ Scope {
         bodyMarkupSupported: true
         onNotification: n => {
             n.tracked = true;
+            Attention.notified(n);
             cardComponent.createObject(stack, { n: n, width: Qt.binding(() => stack.width) });
             // A burst would grow the stack off the screen; the oldest card
             // makes room. There is no history, so it is gone for good.

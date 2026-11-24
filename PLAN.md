@@ -80,7 +80,7 @@ AI_TIER=gpu
 | fonts | FiraCode Nerd, Noto, emoji | all |
 | zsh | zsh + plugins, chsh (config to port) | all |
 | hypr | Hyprland, portals, polkit agent, screenshots, xdg-user-dirs | all |
-| quickshell | Bar, shader background, lock screen + idle lock/DPMS, notification popups, volume OSD, mute/offline/load indicators, calendar popup (click the date), launcher (Super+Space all, Super+D apps, Super+P projects from fzf-marks, Super+Ctrl+P actions; also windows, calculator, web), app glyphs instead of an icon theme | all |
+| quickshell | Bar, shader background, lock screen + idle lock/DPMS, notification popups, volume OSD, mute/offline/load indicators, calendar popup (click the date), red attention pills for apps with unread (LauncherEntry counts, else notifications), plus a dot on their workspace (no tray), launcher (Super+Space all, Super+D apps, Super+P projects from fzf-marks, Super+Ctrl+P actions; also windows, calculator, web), app glyphs instead of an icon theme | all |
 | kitty | kitty (config to port) | all |
 | chrome | Google Chrome, opens on the Browser workspace | vm |
 | telegram / slack | Telegram, Slack: start with the session on the Chat workspace | vm |
@@ -119,7 +119,7 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 2a. [ ] Snapshots module: snapper + snap-pac + bootable snapshots
 2b. [ ] Time: NTP sync (systemd-timesyncd) and timezone per profile; the VM base image is UTC with no NTP
 3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, kitty → ghostty ✓; nvim, git, scripts left
-4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓, launcher ✓, app glyphs ✓, calendar popup ✓; tray → attention indicator (unread from our notifications, urgent windows, SNI NeedsAttention) left; then a timers module (pomodoro, reminders via systemd timers)
+4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓, launcher ✓, app glyphs ✓, calendar popup ✓, attention indicator in place of a tray (LauncherEntry unread counts, our notifications, urgent windows, SNI NeedsAttention) ✓; left: a timers module (pomodoro, reminders via systemd timers)
 5. [ ] Theme tokens + generators
 6. [ ] Action catalog generator + help overlay; the catalog feeds the launcher's Actions
 7. [ ] Bitwarden SSH restore, restic state backup/restore

@@ -93,6 +93,19 @@ PanelWindow {
                             Behavior on color { ColorAnimation { duration: 150; easing.type: Easing.OutCubic } }
                         }
 
+                        // An app here has something unread. Not on the
+                        // workspace you're on: it would sit on the pill, and
+                        // the app's own pill on the right already says it.
+                        Rectangle {
+                            visible: !tab.focused && Attention.items.some(i => i.workspace === tab.modelData.id)
+                            anchors { right: parent.right; top: parent.top; rightMargin: 3; topMargin: 2 }
+                            width: 7
+                            height: 7
+                            radius: width / 2
+                            color: Theme.red
+                            border { width: 1; color: Theme.bg }
+                        }
+
                         HoverHandler { id: hover }
                         // Not modelData.activate(): it sends the pre-Lua `workspace N`
                         // dispatch, which Hyprland 0.57 rejects. By id where there is
@@ -117,6 +130,57 @@ PanelWindow {
         Row {
             anchors { right: date.left; rightMargin: 24; top: parent.top; bottom: parent.bottom }
             spacing: 16
+
+            // Apps with something unread, in red so the eye catches them;
+            // click opens, right click dismisses what came by notification
+            // (an app's own count only clears when it's read).
+            Repeater {
+                model: Attention.items
+
+                Rectangle {
+                    id: app
+                    required property var modelData
+                    anchors.verticalCenter: parent.verticalCenter
+                    // The plate already pads the glyph, so less on the left.
+                    width: pill.width + 4 + 9
+                    height: 22
+                    radius: height / 2
+                    color: Theme.alpha(Theme.red, 0.14)
+                    border { width: 1.5; color: Theme.red }
+
+                    Row {
+                        id: pill
+                        x: 4
+                        height: parent.height
+                        spacing: 4
+
+                        // Just the glyph: the pill is its plate.
+                        AppGlyph {
+                            anchors.verticalCenter: parent.verticalCenter
+                            size: 20
+                            appId: app.modelData.appId ?? ""
+                            appClass: app.modelData.appClass
+                            color: "transparent"
+                            border.width: 0
+                        }
+
+                        Label {
+                            visible: app.modelData.count > 0
+                            text: app.modelData.count > 99 ? "99+" : app.modelData.count
+                            color: Theme.red
+                            font.bold: true
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: mouse => mouse.button === Qt.RightButton
+                            ? app.modelData.dismiss?.() : app.modelData.open()
+                    }
+                }
+            }
 
             Indicator {
                 active: Resources.cpuLevel > 0

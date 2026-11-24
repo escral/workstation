@@ -9,7 +9,7 @@ workstation. Not a distro — a layer on top of Arch.
 |---|---|---|
 | Base | Arch Linux (`archinstall`, then `boot.sh`) | Rolling, AUR has Hyprland/Quickshell, fast iteration |
 | Compositor | Hyprland | Biggest ecosystem; Quickshell works with it |
-| Terminal | Ghostty (trial vs kitty): background service + D-Bus ≈130ms; splits/tabs are Hyprland windows/groups. Super+Enter opens where the focused app works (Ghostty: self-split; others: deepest interactive child's cwd) | One navigation system (Super+hjkl) for everything; context-aware terminal |
+| Terminal | Ghostty: background service + D-Bus ≈130ms; splits/tabs are Hyprland windows/groups. Super+Enter opens where the focused app works (Ghostty: self-split; others: deepest interactive child's cwd) | One navigation system (Super+hjkl) for everything; context-aware terminal |
 | Shell UI | Quickshell | Bar, launcher, notifications, OSD, help overlay — replaces dunst/rofi/i3status |
 | GUI fallback | nm-connection-editor (VPN/proxy), pavucontrol, blueman | Configure things by GUI when no tool exists. Full GNOME session dropped (~1GB) — revisit if needed |
 | Session | greetd + Quickshell login screen (in cage) → `uwsm start hyprland.desktop` | Login looks like the lock screen; uwsm = systemd-managed session: clean env, apps as units, proper logout |
@@ -60,7 +60,7 @@ Modules expose include points instead, e.g. `hyprland.lua` loads
 
 ```bash
 extends=base
-modules+=(hypr kitty)
+modules+=(hypr ghostty)
 GPU=nvidia
 AI_TIER=gpu
 ```
@@ -87,7 +87,6 @@ AI_TIER=gpu
 | zsh | zsh, oh-my-zsh without plugins, autosuggestions, starship; chsh | all |
 | hypr | Hyprland, portals, polkit agent, screenshots, xdg-user-dirs | all |
 | quickshell | Bar, shader background, lock screen + idle lock/DPMS, notification popups, volume OSD, mute/offline/load indicators, calendar popup (click the date), red attention pills for apps with unread (LauncherEntry counts, else notifications from apps with a desktop entry; script notify-send only pops up), plus a dot on their workspace (no tray), launcher (Super+Space all, Super+D apps, Super+P projects from fzf-marks, Super+Ctrl+P actions; also windows, calculator, web), app glyphs instead of an icon theme | all |
-| kitty | kitty (config to port) | all |
 | claude | Claude desktop app (AUR repack of the official .deb; opens on the AI workspace, dark by its own flag), Claude Code CLI (native installer, updates itself), `~/.claude/settings.json` in the repo | home, work, vm |
 | docker | docker, compose, buildx; socket-activated daemon, user in the docker group, published ports on localhost unless bound explicitly (docker bypasses ufw) | home, work, vm |
 | chrome | Google Chrome, opens on the Browser workspace | vm |
@@ -123,13 +122,14 @@ action { title = "Sync project marks", run = "marks-sync /var/www", terminal = t
 
 ## Help overlay
 
-- Hold Super past the key repeat delay (a `long_press` bind) → the catalog's
-  hotkeys, grouped, in as many columns as the screen fits; release hides it
-  (a `transparent` release bind, which still fires after a combo).
+- Super+? opens the catalog's hotkeys, grouped, in as many columns as the
+  screen fits; Esc or Super+? again closes. Not on a held Super: Super is
+  often held while deciding what to press.
 - Entries with `app = "<class>"` show only while that app is focused.
-- Held keys dim on every row, so each shows what is left to press; rows the
-  held modifiers can't reach dim whole. Hyprland tracks the modifiers in Lua
-  and tells Quickshell only while the help is up.
+- While it is up, held keys are marked on every row, so each shows what is
+  left to press; rows the held modifiers can't reach dim whole. Hyprland
+  tracks the modifiers in Lua and writes the state to a file the overlay
+  watches.
 - Later: a leader key into Hyprland submaps (`w` window, `s` screenshot...)
   with a which-key popup at each step.
 
@@ -138,9 +138,9 @@ action { title = "Sync project marks", run = "marks-sync /var/www", terminal = t
 1. [x] Skeleton, `ws` CLI, bootstrap, starter modules/profiles
 2. [x] VM: `ws vm base` + `ws vm fresh` green, Hyprland (Lua config) + Quickshell bar running
 2b. [x] Time: NTP sync (systemd-timesyncd) and timezone per profile
-3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, kitty → ghostty ✓, git ✓, scripts ✓ (`marks-sync`, `vpn`; the rest replaced or dropped); nvim left
+3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, terminal → Ghostty ✓, git ✓, scripts ✓ (`marks-sync`, `vpn`; the rest replaced or dropped); nvim left
 4. [x] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓, app placement + autostart (`apps.d`) ✓, launcher ✓, app glyphs ✓, calendar popup ✓, "no results" line in the launcher ✓, attention indicator in place of a tray (LauncherEntry unread counts, our notifications, urgent windows, SNI NeedsAttention) ✓
-5. [x] Action catalog, designed together with 6: `bind {}` / `action {}` in `actions.d/` ✓, launcher's Actions from it ✓, existing hotkeys moved over ✓, help overlay on held Super ✓; later: `confirm`, providers, leader key
+5. [x] Action catalog, designed together with 6: `bind {}` / `action {}` in `actions.d/` ✓, launcher's Actions from it ✓, existing hotkeys moved over ✓, help overlay on Super+? ✓; later: `confirm`, providers, leader key
 6. [ ] Theme tokens + generators: mainly one place for the colours every app uses; switching themes (an action) is a nice extra
 7. [x] Secrets from Bitwarden (`ws secrets`: SSH keys, ssh hosts, git identity) ✓; app state backup/restore to a USB drive (`ws backup` / `ws restore`) ✓
 8. [ ] AI module (embeddings search, first in the launcher; whisper dictation, piper)

@@ -12,7 +12,7 @@ workstation. Not a distro — a layer on top of Arch.
 | Terminal | Ghostty (trial vs kitty): background service + D-Bus ≈130ms; splits/tabs are Hyprland windows/groups. Super+Enter opens where the focused app works (Ghostty: self-split; others: deepest interactive child's cwd) | One navigation system (Super+hjkl) for everything; context-aware terminal |
 | Shell UI | Quickshell | Bar, launcher, notifications, OSD, help overlay — replaces dunst/rofi/i3status |
 | GUI fallback | nm-connection-editor (VPN/proxy), pavucontrol, blueman | Configure things by GUI when no tool exists. Full GNOME session dropped (~1GB) — revisit if needed |
-| Session | greetd + tuigreet → `uwsm start hyprland.desktop` | uwsm = systemd-managed session: clean env, apps as units, proper logout |
+| Session | greetd + Quickshell login screen (in cage) → `uwsm start hyprland.desktop` | Login looks like the lock screen; uwsm = systemd-managed session: clean env, apps as units, proper logout |
 | Filesystem | **btrfs** (archinstall default subvolumes) — required at install time | Enables snapshots; can't be added later without reinstall |
 | Snapshots | snapper + snap-pac (snapshot before every pacman run), bootable snapshots | Rollback = Arch's replacement for "LTS stability" |
 | Updates | No unattended upgrades. `ws update` + notifier (checkupdates) + paccache.timer | Rolling release should be upgraded while watched |
@@ -76,7 +76,7 @@ AI_TIER=gpu
 | cli | fzf, ripgrep, fd, jq, unzip, man-db, btop | all |
 | firewall | ufw | all |
 | maintenance | pacman-contrib, paccache.timer | all |
-| login | greetd + tuigreet → uwsm Hyprland | all |
+| login | greetd + cage running the Quickshell login screen → uwsm Hyprland | all |
 | fonts | FiraCode Nerd, Noto, emoji | all |
 | zsh | zsh + plugins, chsh (config to port) | all |
 | hypr | Hyprland, portals, polkit agent, screenshots, xdg-user-dirs | all |
@@ -117,7 +117,7 @@ Ported from `~/.dotfiles/bin/.local/action-hub` (Bun/TS).
 2a. [ ] Snapshots module: snapper + snap-pac + bootable snapshots
 2b. [ ] Time: NTP sync (systemd-timesyncd) and timezone per profile; the VM base image is UTC with no NTP
 3. [~] Port from `~/.dotfiles`: zsh ✓, fzf ✓, kitty → ghostty ✓; nvim, git, scripts left
-4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓; tray, per-profile autostart left
+4. [~] Desktop polish before more modules: Tokyo Night + glass windows ✓, shader background ✓, workspace bar ✓, window animations ✓, lock screen ✓, login screen ✓, notification popups ✓, volume OSD + bar mute icon ✓, offline network icon ✓, CPU/RAM/disk indicators ✓; tray, per-profile autostart left
 5. [ ] Theme tokens + generators
 6. [ ] Action catalog generator + help overlay
 7. [ ] Bitwarden SSH restore, restic state backup/restore

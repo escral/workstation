@@ -10,3 +10,10 @@ for src in "$dir"/*.frag; do
   /usr/lib/qt6/bin/qsb --glsl "100 es,120,150" --hlsl 50 --msl 12 -o "$out" "$src"
   info "compiled $(basename "$out")"
 done
+
+# The login screen runs as the greeter user, who can't read this home, so it
+# gets its own copy of the config to sit in.
+greeter=/etc/greetd/quickshell
+sudo rm -rf "$greeter"
+sudo cp -rL "$HOME/.config/quickshell" "$greeter"
+sudo cp "$WS_MODULE_DIR/greeter.qml" "$greeter/"

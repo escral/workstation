@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 # New Ghostty window via the background instance (D-Bus, ~130ms; the CLI
-# boots GTK just to hand off). With a pid, opens where that app is working:
-# the cwd of its deepest interactive child (shell, nvim, ...).
+# boots GTK just to hand off, and drops --working-directory on the way). With
+# a directory, opens there; with a pid, where that app is working: the cwd of
+# its deepest interactive child (shell, nvim, ...).
 set -euo pipefail
 
 dir=$HOME
-if [[ -n ${1:-} ]]; then
+if [[ -d ${1:-} ]]; then
+  dir=$1
+elif [[ -n ${1:-} ]]; then
   pid=$1
   # Follow the newest child that has a terminal: skips helpers like kitty's
   # kittens, which share the parent but aren't where you work.

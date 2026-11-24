@@ -229,7 +229,7 @@ cmd_sync() {
         [ -d ~/workstation/.git ] && mv ~/workstation/.git ~/.ws-new/
         mv ~/workstation ~/.ws-old && mv ~/.ws-new ~/workstation && rm -rf ~/.ws-old'
   ssh_vm -t '~/workstation/bin/ws install --profile vm'
-  ssh_vm 'export HYPRLAND_INSTANCE_SIGNATURE=$(ls "$XDG_RUNTIME_DIR/hypr" 2>/dev/null | head -1)
+  ssh_vm 'export HYPRLAND_INSTANCE_SIGNATURE=$(ls -t "$XDG_RUNTIME_DIR/hypr" 2>/dev/null | head -1)
     [ -n "$HYPRLAND_INSTANCE_SIGNATURE" ] && hyprctl reload >/dev/null && hyprctl configerrors' || true
 }
 

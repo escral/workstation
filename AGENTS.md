@@ -67,7 +67,7 @@ vm/              QEMU test harness
   Ctrl+Alt+G toggles the grab manually. On an NVIDIA host the window is SDL
   (GTK+GL renders black there) and grabs on click instead.
 - `hyprctl` over ssh needs
-  `HYPRLAND_INSTANCE_SIGNATURE=$(ls $XDG_RUNTIME_DIR/hypr | head -1)`.
+  `HYPRLAND_INSTANCE_SIGNATURE=$(ls -t $XDG_RUNTIME_DIR/hypr | head -1)`.
 - Hyprland changes: `ws vm sync` (reloads and prints config errors).
 - Quickshell changes: restart it with
   `pkill quickshell; hyprctl dispatch 'hl.dsp.exec_cmd("uwsm app -- quickshell")'`.
